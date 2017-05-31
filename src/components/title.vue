@@ -9,8 +9,6 @@
                     <text :class="['title-name',black?'black-text':'']">{{titleName}}</text>
                 </div>
             </scroller>
-            <!--<div class="shade first-shade"></div>-->
-            <!--<div class="shade last-shade"></div>-->
         </div>
     </div>
 </template>
@@ -48,25 +46,22 @@
     .init{
         position:relative;
         width:510px;
-        /*height:90px;*/
+        height:89px;
         justify-content: center;
         align-items:center;
-
     }
     .title-init{
-        display: flex;
         flex: 1;
-        height: 90px;
-        padding-left:150px;
-        padding-right:150px;
+        width:510px;
+        height: 89px;
+        /*padding-left:150px;*/
+        /*padding-right:150px;*/
         justify-content: center;
         align-items: center;
         flex-wrap: nowrap;
         flex-direction: row;
     }
     .title-name{
-        /*display: flex;*/
-        /*flex: 1;*/
         color:#333;
         font-size:36px;
         flex-wrap: nowrap;

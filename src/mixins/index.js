@@ -35,13 +35,21 @@ export default {
                 url:ajaxUrl
             },callback)
         },
+        //请求链接
+        ajaxUrl(){
+            let DEV = 'http://cui.product.kache.com';
+            let BUILD = 'http://product-yufabu.360che.com';
+            let DBUG = false;
+            let ajaxUrl = DBUG ? DEV : BUILD;
+            return ajaxUrl;
+        }
     },
     created(){
 
         //iconFont字体
         dom.addRule('fontFace',{
             'fontFamily':'detail',
-            'src':"url(\'https://at.alicdn.com/t/font_1z3q14vor7h3q5mi.woff\')"
+            'src':"url(\'https://at.alicdn.com/t/font_scqt9ftimh9nqaor.woff\')"
         });
     }
 }

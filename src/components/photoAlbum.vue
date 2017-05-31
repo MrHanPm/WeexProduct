@@ -21,7 +21,7 @@
                     </div>
                 </div>
                 <div class="photo-wrapper">
-                    <div v-for="img in ele.imgList" class="photo-list" @click="clickImgList(img)">
+                    <div v-for="img in ele.imgList" class="photo-list" @click="clickImgList(img,ele)">
                         <image :src="img.url" style="width:223px;height:140px;"></image>
                     </div>
                 </div>
@@ -50,9 +50,9 @@
                 this.$emit('detailed',typeId)
             },
             //点击图片列表，进入图片详情页
-            clickImgList(img){
+            clickImgList(img,ele){
                 //存储图片详细信息，然后进入图片详情页。
-                console.log(img)
+                img.typeId = ele.F_TypeId;
                 storage.setItem('imgDataInfo',JSON.stringify(img),ele => {
                     if(ele.result == 'success'){
 //                        this.goWeexUrl('photoInfo.weex.js')

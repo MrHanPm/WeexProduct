@@ -163,14 +163,14 @@
             selectLocationPop(){
                 this.LocationPop = !this.LocationPop;
             },
-            //发送请求
-            getData(url,callback){
-                return stream.fetch({
-                    method:'GET',
-                    type:'json',
-                    url:url
-                },callback)
-            },
+//            //发送请求
+//            getData(url,callback){
+//                return stream.fetch({
+//                    method:'GET',
+//                    type:'json',
+//                    url:url
+//                },callback)
+//            },
             //选择城市后保存已选择城市信息
             getLocationInfo(locationInfo){
                 this.locationInfo = locationInfo;

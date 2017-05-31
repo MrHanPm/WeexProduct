@@ -27,8 +27,12 @@ function getBaseConfig() {
             model: path.resolve('./build/model.js'),
             //车系图片页
             seriesPhoto: path.resolve('./build/seriesPhoto.js'),
-            //图片详情页
+            //车系图片详情页
             photoInfo: path.resolve('./build/photoInfo.js'),
+            //经销商页
+            dealer: path.resolve('./build/dealer.js'),
+            //配置页
+            config: path.resolve('./build/config.js'),
         },
         output: {
             path: 'dist',

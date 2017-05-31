@@ -7,11 +7,11 @@
                 </div>
             </div>
         </scroller>
-        <div class="shade first-shade"></div>
-        <div class="shade last-shade"></div>
-        <div :class="['fold',unfold?'unfold':'']" @click="unFold">
-            <text :style="{fontFamily:'detail',color:'#333',fontSize:'16px'}" ref="unfold">&#xe605;</text>
-        </div>
+        <!--<div class="shade first-shade"></div>-->
+        <!--<div class="shade last-shade"></div>-->
+        <!--<div :class="['fold',unfold?'unfold':'']" @click="unFold">-->
+            <!--<text :style="{fontFamily:'detail',color:'#333',fontSize:'16px'}" ref="unfold">&#xe605;</text>-->
+        <!--</div>-->
     </div>
 </template>
 
@@ -25,6 +25,13 @@
             return {
                 unfold: false,
             }
+        },
+        created(){
+            this.$nextTick(() => {
+                        console.log(this.navList)
+            }
+
+            )
         },
         methods: {
             //展开收起导航列表
@@ -87,7 +94,7 @@
     .init {
         height: 80px;
         min-width: 750px;
-        padding-right:108px;
+        /*padding-right:108px;*/
         flex-direction: row;
         justify-content: flex-start;
         align-items: center;
@@ -99,11 +106,12 @@
     }
 
     .option {
-        padding-left: 32px;
-        padding-right: 32px;
+        flex:1;
+        /*padding-left: 32px;*/
+        /*padding-right: 32px;*/
         height: 80px;
-        justify-content: flex-end;
-        align-items: flex-end;
+        justify-content: center;
+        align-items: center;
         /*background-color:red;*/
         /*margin-bottom: 20px;*/
     }
@@ -111,7 +119,8 @@
     .option-text {
         color: #333;
         font-size: 28px;
-        padding-bottom: 23px;
+        padding-top: 20px;
+        padding-bottom: 19px;
     }
 
     .visible {

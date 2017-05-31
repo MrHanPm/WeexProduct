@@ -137,6 +137,8 @@
                                     this.proName = '全部车型';
                                     //图片内容选项
                                     this.photoData.options = ele.data.data.tab;
+                                    //存储图片页面的tab标题
+                                    storage.setItem('PhotoTabName',JSON.stringify(this.photoData.options))
                                     //图片内容
                                     this.photoData.content = ele.data.data.list;
                                 }
