@@ -1,7 +1,7 @@
 /**
  * Created by zhouhepeng on 2017/5/10.
  */
-import photoInfo from '../src/views/PhotoInfo.vue'
+import photoInfo from '../src/views/photoInfo.vue'
 import mixins from '../src/mixins'
 Vue.mixin(mixins)
 photoInfo.el = '#root'

@@ -3,7 +3,7 @@
         <list class="list">
             <cell>
                 <nav-bar @historyShow="historyShow"></nav-bar>
-                <recommend-list :recommendList="recommendList" @SidebarShow="SidebarShow"></recommend-list>
+                <recommend-list :recommendList="recommendList" @SidebarShow="SidebarShow" v-if="!errorButton"></recommend-list>
             </cell>
             <cell v-for="(brandListInfo,index) in brandList" :ref="indexNav[index]">
                 <brand-list :brandListInfo="brandListInfo" :index="indexNav[index]" @SidebarShow="SidebarShow"></brand-list>
@@ -38,14 +38,12 @@
                         <div class="truck-info" :href="'https://product.m.360che.com' + ele.series_url.detailUrl" @click="goInfo(ele)">
                             <image v-if="ele.img" style="width:150px;height:100px;" :src="ele.img[0].src"></image>
                             <div v-else class="not-image">
-                                <image src="https://s.kcimg.cn/wap/images/app_icon/logo.png" style="width:150px;height:100px"></image>
+                                <image src="https://s.kcimg.cn/wap/images/app_icon/logo_2.png" style="width:131px;height:48px"></image>
                                 <!--<text :style="{fontFamily:'detail',fontSize:'40px',color:'#999'}">&#x5361;</text>-->
                             </div>
                             <div class="truck-detail">
-                                <text class="truck-name">{{ele.info.F_ShortName}}</text>
-                                <text class="truck-price">{{ele.priceScope.min ? ele.priceScope.min + '~' +
-                                    ele.priceScope.max + '万元' : '暂无报价'}}
-                                </text>
+                                <text class="truck-name">{{ele.info.F_ShortName?ele.info.F_ShortName:ele.info.F_SeriesName + ele.info.F_SubCategoryName}}</text>
+                                <text class="truck-price">{{ele.priceScope.min ? (ele.priceScope.min == ele.priceScope.max ? ele.priceScope.min + '万元' : ele.priceScope.min + '~' + ele.priceScope.max + '万元') : '暂无报价'}}</text>
                             </div>
                         </div>
                     </div>
@@ -65,13 +63,12 @@
                         <div class="truck-info" :href="'https://product.m.360che.com' + ele.series_url.detailUrl" @click="goInfo(ele)">
                             <image v-if="ele.img" style="width:150px;height:100px;" :src="ele.img[0].src"></image>
                             <div v-else class="not-image">
-                                <!--<image src="https://s.kcimg.cn/wap/images/app_icon/bad.png" style="width:311px;height:110px;"></image>-->
-                                <text :style="{fontFamily:'detail',fontSize:'40px',color:'#999'}">&#x5361;</text>
+                                <image src="https://s.kcimg.cn/wap/images/detail/productApp/truck-home.png" style="width:131px;height:48px;"></image>
+                                <!--<text :style="{fontFamily:'detail',fontSize:'40px',color:'#999'}">&#x5361;</text>-->
                             </div>
                             <div class="truck-detail">
-                                <text class="truck-name">{{ele.info.F_ShortName}}</text>
-                                <text class="truck-price">{{ele.priceScope.min ? (ele.priceScope.min == ele.priceScope.max ? ele.priceScope.min + '万元' : ele.priceScope.min + '~' + ele.priceScope.max + '万元') : '暂无报价'}}
-                                </text>
+                                <text class="truck-name">{{ele.info.F_ShortName?ele.info.F_ShortName:ele.info.F_SeriesName + ele.info.F_SubCategoryName}}</text>
+                                <text class="truck-price">{{ele.priceScope.min ? (ele.priceScope.min == ele.priceScope.max ? ele.priceScope.min + '万元' : ele.priceScope.min + '~' + ele.priceScope.max + '万元') : '暂无报价'}}</text>
                             </div>
                         </div>
                     </div>
@@ -96,6 +93,15 @@
             </div>
         </div>
 
+        <!--加载失败重新加载按钮-->
+        <div class="error-button" v-if="errorButton">
+            <image src="https://s.kcimg.cn/wap/images/detail/productApp/not_network.png" style="width:400px;height:300px;"></image>
+            <text class="not_network">当前网络不可用</text>
+            <div class="reload" @click="getBrandsData">
+                <text class="reload-text">点击刷新</text>
+            </div>
+        </div>
+
         <!--网络失败弹窗-->
         <error-pop v-if="errorPopShow" :errorPopText="errorPopText"></error-pop>
     </div>
@@ -116,7 +122,8 @@
     let animation = weex.requireModule('animation')
     let modal = weex.requireModule('modal')
     let storage = weex.requireModule('storage')
-//    let thaw = weex.requireModule('THAW')
+    let thaw = weex.requireModule('THAW')
+    var globalEvent = weex.requireModule('globalEvent');
 //    let navigator = weex.requireModule('navigator')
 
     export default {
@@ -152,6 +159,8 @@
                 errorPopShow:false,
                 //提示文案
                 errorPopText:'当前网络不可用，请检查网络设置',
+                //网络出错重新加载按钮
+                errorButton:false,
             }
         },
         methods: {
@@ -176,6 +185,13 @@
             },
             //sidebar内容点击跳转
             goInfo(ele){
+                let p4 = ele.info.F_BrandId + '_' + ele.info.F_CateId + '_' + ele.info.F_SubCategoryId;
+                let p5 = ele.info.F_SeriesId;
+                //存储p4
+                storage.setItem('p4',p4)
+                storage.setItem('p5',p5)
+
+
                 //存储历史记录
                 storage.getItem('historyData',data => {
                     if(data.result == 'success'){
@@ -196,7 +212,7 @@
                                 if(success.result == 'success'){
                                     //成功之后跳转url
 //                                    thaw.goUrl('https://product.m.360che.com' + ele.series_url.detailUrl);
-
+                                    this.showLoading();
                                     //存储车系数据
                                     storage.setItem('seriesInfo',JSON.stringify(ele.info),() => {
                                         //跳转
@@ -208,7 +224,7 @@
                         }else{
                             //已有的历史记录直接跳转
 //                            thaw.goUrl('https://product.m.360che.com' + ele.series_url.detailUrl)
-
+                            this.showLoading()
                             //存储车系数据
                             storage.setItem('seriesInfo',JSON.stringify(ele.info),() => {
                                 //跳转
@@ -225,7 +241,7 @@
                             if(success.result == 'success'){
                                 //成功之后跳转url
 //                                thaw.goUrl('https://product.m.360che.com' + ele.series_url.detailUrl)
-
+                                this.showLoading();
                                 //存储车系数据
                                 storage.setItem('seriesInfo',JSON.stringify(ele.info),() => {
                                     //跳转
@@ -239,6 +255,8 @@
             },
             //显示历史记录
             historyShow(){
+              // this.alert(1)
+              console.log('展开历史记录')
                 //隐藏展开更多车系按钮
                 this.moreSeriesButtonShow = false;
                 //隐藏sidebar内容标题
@@ -291,12 +309,11 @@
                 })
             },
             //显示sidebar
-            SidebarShow(url,other){
-                let _this = this;
-
-                let ajaxUrl = url.replace('product.m.360che.com', 'product-yufabu.m.360che.com');
-                ajaxUrl = ajaxUrl.replace('https', 'http');
-                ajaxUrl += '&isJson=1&noIndex=1';
+            SidebarShow(ele,other){
+                console.log(ele)
+//                let ajaxUrl = ele.url.replace('product.m.360che.com', 'product-yufabu.m.360che.com');
+//                ajaxUrl = ajaxUrl.replace('https', 'http');
+                let ajaxUrl = ele.url + '&isJson=1&noIndex=1';
 
 //                let ajaxUrl = url + '&isJson=1&noIndex=1';
 
@@ -311,7 +328,17 @@
 //                });
 
                 this.getData(ajaxUrl, data => {
+
+                    let p3 = ele.id + '__';
+                    if(!ele.id){
+                        p3 = ele.F_BrandId + '__'
+                    }
+
                     if (data.ok) {
+                        //大数据发送事件类
+                        this.collect({
+                            'p3':p3
+                        })
 
                         //如果没有更多车系,隐藏展开更多车系按钮
                         if(data.data.otherSeriesList.length == 0){
@@ -328,8 +355,8 @@
 
                         this.showSidebar = true;
                         this.shadeShow = true;
-                        this.$nextTick(function(){
-                            var side = _this.$refs.side;
+                        this.$nextTick(() => {
+                            var side = this.$refs.side;
                             animation.transition(side, {
                                 styles: {
                                     transform: 'translate(0,0)'
@@ -348,7 +375,6 @@
             },
             //隐藏sidebar
             sidebarHide(){
-                let _this = this;
                 //隐藏遮罩层
                 this.shadeShow = false;
                 //隐藏更多车系按钮
@@ -374,7 +400,7 @@
                     });
                 }
 
-                var side = _this.$refs.side;
+                var side = this.$refs.side;
                 animation.transition(side, {
                     styles: {
                         transform: 'translate(750px,0)'
@@ -408,15 +434,68 @@
                     timingFunction: 'ease-out',
                     delay: 0 //ms
                 })
+            },
+            //点击重新加载数据
+            getBrandsData(){
+                this.getData(this.ajaxUrl() +'/index.php?r=api/gethotbrandlist&haveGroup=1&noIndex=1', data => {
+//                this.alert(this.ajaxUrl() + '/index.php?r=api/gethotbrandlist&haveGroup=1&noIndex=1')
+//                this.alert(JSON.stringify(data))
+                    if (data.ok) {
+                        //推荐品牌列表
+                        this.recommendList = data.data.recommend;
+                        //品牌列表
+                        this.brandList = data.data.brandList;
+                        //nav导航
+                        this.indexNav = data.data.letter;
+                        //更多品牌列表
+                        this.otherBrandList = data.data.otherBrandList;
+
+                        //显示展开更多品牌按钮
+                        this.$nextTick(function(){
+                            this.moreBrandShow = true;
+                        });
+
+                        this.errorPopShow = false;
+                        this.errorButton = false;
+
+//                        storage.setItem('brandsData', JSON.stringify(data));
+                    } else {
+                        if(!this.moreBrandShow){
+                            this.errorPopShow = true;
+                            this.errorButton = true;
+                        }
+                    }
+                });
             }
         },
         created(){
-            let domModule = weex.requireModule('dom');
+            //存储deviceId
+            if(weex.config.deviceId){
+                storage.setItem('deviceId',weex.config.deviceId)
+            }
+
+            //存储uid
+            if(weex.config.userId){
+                storage.setItem('userId',weex.config.userId)
+            }
+            // this.alert(JSON.stringify(weex.config.userId))
+
+//            //发送GA统计
+            this.collect({
+            })
+
             //iconFont字体
-            domModule.addRule('fontFace',{
+            dom.addRule('fontFace',{
                 'fontFamily':'detail',
                 'src':"url(\'https://at.alicdn.com/t/font_1z3q14vor7h3q5mi.ttf\')"
             });
+
+            //请求接口,查看版本号
+            this.getData(this.ajaxUrl() + '/index.php?r=weex/index/version',ele => {
+                if(ele.ok && ele.data.info == 'ok'){
+                    storage.setItem('versions',ele.data.version)
+                }
+            })
 
 //            storage.getItem('brandsData', ele => {
 //                if (ele.result == 'success') {
@@ -426,8 +505,13 @@
 ////                    显示展开更多品牌按钮
 //                    this.moreBrandShow = true;
 //                } else {
-            this.getData('https://product.360che.com/index.php?r=api/gethotbrandlist&haveGroup=1&noIndex=1', data => {
-                if (data.ok) {
+//            this.alert(1)
+
+            //获取品牌缓存
+
+            storage.getItem('brandsData',ele => {
+                if(ele.result == 'success'){
+                    let data = JSON.parse(ele.data)
                     //推荐品牌列表
                     this.recommendList = data.data.recommend;
                     //品牌列表
@@ -436,18 +520,16 @@
                     this.indexNav = data.data.letter;
                     //更多品牌列表
                     this.otherBrandList = data.data.otherBrandList;
+
                     //显示展开更多品牌按钮
                     this.$nextTick(function(){
                         this.moreBrandShow = true;
                     });
-                    storage.setItem('brandsData', JSON.stringify(data));
-                } else {
-                    this.errorPopShow = true;
                 }
-            });
-//                }
-//            })
 
+                //请求品牌数据
+                this.getBrandsData()
+            })
         },
         components: {
             navBar,
@@ -472,6 +554,14 @@
 //                url: 'https://192.168.1.120:8888/dist/series.weex.js',
 //                animated: "true"
 //            })
+            globalEvent && globalEvent.addEventListener("onSendLocation",(e) => {
+                if(e.state == 'success') {
+                    storage.setItem('getlocationInfo', JSON.stringify(e))
+                }
+            })
+
+            //调取地理位置信息
+            thaw && thaw.getLocation();
 
         }
     }
@@ -644,5 +734,34 @@
         color:#999;
         font-size:32px;
         padding-top:20px;
+    }
+    .error-button{
+        position:absolute;
+        left: 0 ;
+        right:0;
+        top:0;
+        bottom:0;
+        align-items: center;
+        justify-content: center;
+    }
+    .reload{
+        width:180px;
+        height:64px;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+        border-top-left-radius:10px;
+        border-top-right-radius:10px;
+        border-bottom-left-radius:10px;
+        border-bottom-right-radius:10px;
+        background-color:#1571E5;
+    }
+    .not_network{
+        margin-top:10px;
+        color:#999;
+    }
+    .reload-text{
+        color:#fff;
+        font-size:28px;
     }
 </style>

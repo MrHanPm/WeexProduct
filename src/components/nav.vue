@@ -1,5 +1,5 @@
 <template>
-    <div class="nav">
+    <div class="nav" v-if="navList.length">
         <scroller scroll-direction="horizontal" show-scrollbar="false" :class="['wrapper',unfold?'wrapper-fold':'']">
             <div :class="['init',unfold?'init-fold':'']">
                 <div v-for="ele in navList" class="option" @click="clickNavList(ele)">
@@ -27,11 +27,6 @@
             }
         },
         created(){
-            this.$nextTick(() => {
-                        console.log(this.navList)
-            }
-
-            )
         },
         methods: {
             //展开收起导航列表
@@ -50,23 +45,27 @@
             },
             //点击导航列表
             clickNavList(ele){
-                //如果是从车系页面进入图片页，
-                if(this.navInfo == 'series' && ele.name == '图片'){
-                    //获取有没有车型id
-                    storage.getItem('ProductId',ele => {
-                        if(ele.result == 'success'){
-                            //如果有车型id，那么删掉车型id
-                            storage.removeItem('ProductId',remove => {
-                                if(remove.result == 'success'){
-                                    //进入图片页
-                                    this.goWeexUrl(ele.url)
-                                }
-                            });
-                        }else{
-                            this.goWeexUrl(ele.url)
-                        }
-                    })
+                if(ele.selected){
+                    return ;
                 }
+                this.goWeexUrl(ele.url)
+                //如果是从车系页面进入图片页，
+//                if(this.navInfo == 'series' && ele.name == '图片'){
+                    //获取有没有车型id
+//                    storage.getItem('ProductId',ele => {
+//                        if(ele.result == 'success'){
+//                            //如果有车型id，那么删掉车型id
+//                            storage.removeItem('ProductId',remove => {
+//                                if(remove.result == 'success'){
+//                                    //进入图片页
+//                                    this.goWeexUrl(ele.url)
+//                                }
+//                            });
+//                        }else{
+//                            this.goWeexUrl(ele.url)
+//                        }
+//                    })
+//                }
             }
         }
     }
@@ -93,7 +92,7 @@
 
     .init {
         height: 80px;
-        min-width: 750px;
+        width: 750px;
         /*padding-right:108px;*/
         flex-direction: row;
         justify-content: flex-start;
@@ -115,7 +114,9 @@
         /*background-color:red;*/
         /*margin-bottom: 20px;*/
     }
-
+    .option:active{
+        background-color: rgba(0,0,0,.3);
+    }
     .option-text {
         color: #333;
         font-size: 28px;

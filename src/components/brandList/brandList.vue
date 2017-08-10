@@ -4,7 +4,7 @@
             <text class="title-text">{{index}}</text>
         </div>
         <div class="model-list" v-for="(data,number) in brandListInfo">
-            <div class="content" v-if="!data.list" @click="SidebarShow(data.url)">
+            <div class="content" v-if="!data.list" @click="SidebarShow(data)">
                 <image style="width:120px;height:80px;" :src="data.logo"></image>
                 <text class="brand-name">{{data.F_BrandName}}</text>
             </div>
@@ -24,7 +24,7 @@
                     </div>
                 </div>
                 <div class="subclass">
-                    <div v-for="(res,i) in data.list" class="subclass-name" @click="SidebarShow(res.url)">
+                    <div v-for="(res,i) in data.list" class="subclass-name" @click="SidebarShow(res)">
                         <text class="subclass-name-text">{{res.F_BrandName}}</text>
                     </div>
                 </div>

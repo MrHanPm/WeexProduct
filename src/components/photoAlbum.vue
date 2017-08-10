@@ -1,10 +1,10 @@
 <template>
     <div class="photo-album">
-        <div class="options">
+        <div class="options" v-if="!isRecommend">
             <div  :class="['option',photoData.typeId == 0 ? 'option-selected' : '']" @click="detailed(0)">
                 <text :class="['option-text',photoData.typeId == 0 ? 'option-selected-text' : '']">全部</text>
             </div>
-            <div v-for="ele in photoData.options" :class="['option',photoData.selected == ele.id ? 'option-selected' : '']" @click="detailed(ele.id)">
+            <div v-for="ele in photoData.options" :class="['option',photoData.typeId == ele.id ? 'option-selected' : '']" @click="detailed(ele.id)">
                 <text :class="['option-text',photoData.typeId == ele.id ? 'option-selected-text' : '']">{{ele.name}}</text>
             </div>
         </div>
@@ -17,12 +17,15 @@
                     </div>
                     <div class="more-photo" v-if="photoData.typeId == 0" @click="detailed(ele.F_TypeId)">
                         <text class="more-photo-text">更多</text>
-                        <text :style="{fontFamily:'detail',fontSize:'24px',color:'#586C94'}">&#x53bb;</text>
+                        <!--<text :style="{fontFamily:'detail',fontSize:'24px',color:'#586C94'}">&#x53bb;</text>-->
+                        <image src="https://s.kcimg.cn/wap/images/detail/productApp/go-blue.png" style="width:14px;height:24px;margin-left:10px"></image>
                     </div>
                 </div>
                 <div class="photo-wrapper">
-                    <div v-for="img in ele.imgList" class="photo-list" @click="clickImgList(img,ele)">
-                        <image :src="img.url" style="width:223px;height:140px;"></image>
+                    <div v-for="(img,index) in ele.imgList" class="photo-list" @click="clickImgList(img,ele,index,ele.imgList)">
+                        <!--<text class="img-text" :style="{fontFamily:'detail'}">&#x5361;</text>-->
+                        <image src="https://s.kcimg.cn/wap/images/detail/productApp/truck-home.png" style="width:131px;height:48px;"></image>
+                        <image class="image" :src="img.url" style="width:223px;height:140px;"></image>
                     </div>
                 </div>
             </div>
@@ -34,14 +37,13 @@
     let stream = weex.requireModule('stream');
     let storage = weex.requireModule('storage');
     export default {
-        props:['photoData'],
+        props:['photoData','isRecommend','ProductId'],
         data(){
             return {
-                typeInfo:[],
+                typeInfo:[]
             }
         },
         created(){
-
             console.log(this.photoData)
         },
         methods:{
@@ -50,13 +52,16 @@
                 this.$emit('detailed',typeId)
             },
             //点击图片列表，进入图片详情页
-            clickImgList(img,ele){
+            clickImgList(img,ele,index,imgList){
                 //存储图片详细信息，然后进入图片详情页。
                 img.typeId = ele.F_TypeId;
-                storage.setItem('imgDataInfo',JSON.stringify(img),ele => {
-                    if(ele.result == 'success'){
-//                        this.goWeexUrl('photoInfo.weex.js')
-                    }
+                img.index = index;
+                storage.setItem('imgProductId',this.ProductId,res => {
+                        storage.setItem('imgDataInfo',JSON.stringify(img),ele => {
+                            if(ele.result == 'success'){
+                                this.goWeexUrl('photoInfo.weex.js')
+                            }
+                        })
                 })
             }
         }
@@ -151,10 +156,24 @@
         flex-wrap: wrap;
     }
     .photo-list{
+        position: relative;
         width:223px;
+        height:140px;
+        align-items: center;
+        justify-content: center;
         margin-top:10px;
         margin-right:10px;
         margin-bottom:10px;
         margin-left:10px;
+        background-color:#efefef;
+    }
+    .img-text{
+        color:#d1d1d1;
+        font-size:56px;
+    }
+    .image{
+        position:absolute;
+        top:0;
+        left: 0;
     }
 </style>

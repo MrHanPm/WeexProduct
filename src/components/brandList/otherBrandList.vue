@@ -4,7 +4,7 @@
             <div class="header" v-if="otherBrandShow">
                 <text class="header-text">更多品牌</text>
             </div>
-            <div  v-if="otherBrandShow" v-for="(data,index) in otherBrandList" class="other-brand-list" @click="SidebarShow(data.url)">
+            <div  v-if="otherBrandShow" v-for="(data,index) in otherBrandList" class="other-brand-list" @click="SidebarShow(data)">
                 <div class="content">
                     <image style="width:120px;height:80px;" :src="data.logo"></image>
                     <text class="brand-name">{{data.F_BrandName}}</text>

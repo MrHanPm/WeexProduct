@@ -1,9 +1,11 @@
 <template>
     <div class="slider">
-        <div class="init" ref="slider" :style="{transform: 'translate(' + distance + 'px, 0px)'}" @swipe="Swipe" @touchstart="begin" @touchmove="move" @touchend="end">
-            <div class="img-list" v-for="(img,index) in imgList" >
-                <image class="image" style="width: 750px;height:500px" resize="cover" :src="img.url"></image>
-            </div>
+        <div class="init" ref="slider" :style="{transform: 'translate(' + (index * 750) + 'px, 0px)',width: imgList.length * 750 + 'px'}" @touchstart="begin" @touchend="slide">
+            <div class="img-list" v-for="(img,number) in imgList">
+                <!--<text class="img-text" :style="{fontFamily:'detail'}">&#xe602;</text>-->
+                <!--<image src="https://s.kcimg.cn/wap/images/detail/productApp/image-icon.png" style="width:58px;height:58px;"></image>-->
+                <image class="image" v-if="-index == number || (-index - number) == 1 || (number + index) == 1" style="width: 750px;height:500px" resize="cover" :src="img.url"></image>
+             </div>
         </div>
     </div>
 </template>
@@ -11,74 +13,77 @@
 <script type="text/babel">
     let animation = weex.requireModule('animation');
     export default {
+        props:['imgList','index'],
         data(){
             return {
-                //偏移的距离
-                distance:0,
-                //开始的距离
-                start:'',
-                //现在的下标
-                index:0,
+                identifier:0,
+                direction:'',
             }
         },
         created(){
+//            this.alert(JSON.stringify(this.imgList))
         },
         methods:{
             begin(event){
-                this.start = event.changedTouches[0].screenX;
+                this.identifier = event.changedTouches[0].screenX;
             },
-            Swipe(event){
-                this.alert(JSON.stringify(event))
-            },
-            move(event){
-                this.distance = this.distance + event.changedTouches[0].screenX - this.start;
-                //向右
-//                this.alert(this.distance)
-//                if(this.distance > 0){
-//                    this.alert('向右')
-//                }else{
-//                    this.alert('向左')
-//                }
-            },
-            end(){
-                console.log(this.distance - this.start,'11')
-                if(this.distance - this.start >= 50 || this.distance - this.start <= 50){
-                    //向右
-                    let nihao;
-                    if(this.distance - this.start > 0){
-                        nihao = 750;
-                        --this.index;
-                        if(this.index < 0){
-                            this.index = 0
-                        }
-                    }else{//向左
-                        nihao = -750;
-                        this.index++;
-                    }
-                    let slider = this.$refs.slider;
-                    animation.transition(slider, {
-                        styles: {
-                            transform: 'translate(' + (this.index == 0 ? nihao : this.index * nihao) + 'px, 0)'
-                        },
-                        duration: 300, //ms
-                        timingFunction: 'ease',
-                        delay: 0 //ms
-                    },ele => {
-                        this.distance = this.index == 0 ? nihao : this.index * nihao
-                    })
-
+            slide(event){
+//                this.alert(event.changedTouches[0].screenX)
+                if(event.changedTouches[0].screenX - this.identifier > -50 && event.changedTouches[0].screenX - this.identifier < 50){
+                    this.goImgInfo()
+                    return
                 }
+                if(event.changedTouches[0].screenX - this.identifier > 0){
+                    this.direction = 'left'
+                }else{
+                    this.direction = 'right'
+                }
+                this.$emit('slide',this.direction);
+            },
+            //点击隐藏其他
+            goImgInfo(){
+                this.$emit('goImgInfo')
             }
         },
-        props:['imgList']
+        watch:{
+            index(){
+                let slider = this.$refs.slider;
+                animation.transition(slider, {
+                    styles: {
+                        transform: 'translate(' + this.index * 750  + 'px, 0)'
+                    },
+                    duration: 300, //ms
+                    timingFunction: 'ease',
+                    delay: 0 //ms
+                })
+            }
+        }
     }
 </script>
 
 <style scoped>
-    .slider{
-        overflow: hidden;
-    }
+    /*.slider{*/
+        /*width:750px;*/
+        /*height:500px;*/
+        /*overflow: hidden;*/
+    /*}*/
     .init{
         flex-direction:row;
+    }
+    .img-list{
+        position: relative;
+        width:750px;
+        height:500px;
+        align-items: center;
+        justify-content: center;
+    }
+    .img-text{
+        color:#999;
+        font-size:100px;
+    }
+    .image{
+        position: absolute;
+        left:0;
+        top:0;
     }
 </style>

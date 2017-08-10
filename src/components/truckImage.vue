@@ -1,36 +1,56 @@
 <template>
-    <div class="truck-image" @click="goUrl('http://product.m.360che.com' + truckImageData.imgUrl)">
-        <image :src="truckImageData.imgSrc" style="width:750px;height: 500px"></image>
+    <div class="truck-image"  @click="goWeex">
+        <image v-if="truckImageData.imgSrc" :src="truckImageData.imgSrc" style="width:750px;height: 500px"></image>
+        <div  v-if="truckImageData.notImg"  class="not-img">
+            <text class="not-img-text">很遗憾~没有相关图片</text>
+        </div>
         <div class="img-info">
-            <div class="price">
-                <text class="guide-text">厂商指导价：</text>
-                <div v-if="!truckImageData.priceScope.price" style="flex-direction:row;">
-                    <text class="price-text" v-if="truckImageData.priceScope.min">{{truckImageData.priceScope.min == Math.round(truckImageData.priceScope.min)?Math.round(truckImageData.priceScope.min):truckImageData.priceScope.min}}</text>
-                    <text class="price-text" v-if="truckImageData.priceScope.max">-{{truckImageData.priceScope.max == Math.round(truckImageData.priceScope.max) ? Math.round(truckImageData.priceScope.max) : truckImageData.priceScope.max}}万</text>
+            <div class="price" >
+                <text class="guide-text" v-if="truckImageData.priceScope.price > 0 || truckImageData.priceScope.min > 0 ">厂商指导价：</text>
+                <div v-if="!truckImageData.priceScope.price && truckImageData.priceScope.min > 0" style="flex-direction:row;" class="price-wrapper">
+                    <text class="price-text" v-if="truckImageData.priceScope.min && truckImageData.priceScope.min != truckImageData.priceScope.max">{{truckImageData.priceScope.min == Math.round(truckImageData.priceScope.min)?Math.round(truckImageData.priceScope.min):truckImageData.priceScope.min}}-</text>
+                    <text class="price-text" v-if="truckImageData.priceScope.max">{{truckImageData.priceScope.max == Math.round(truckImageData.priceScope.max) ? Math.round(truckImageData.priceScope.max) : truckImageData.priceScope.max}}万</text>
                 </div>
-                <text v-else class="price-text">{{truckImageData.priceScope.price}}万元</text>
+                <div v-if="!truckImageData.priceScope.price && truckImageData.priceScope.min == 0">
+                    <text class="guide-text">暂无报价</text>
+                </div>
+                <text v-if="truckImageData.priceScope.price > 0" class="price-text">{{truckImageData.priceScope.price == Math.round(truckImageData.priceScope.price) ? Math.round(truckImageData.priceScope.price) : truckImageData.priceScope.price}}万元</text>
+                <text v-if="truckImageData.priceScope.price && truckImageData.priceScope.price == 0" class="guide-text">暂无报价</text>
             </div>
             <text v-if="truckImageData.imgTotal != 0" class="img-total">{{truckImageData.imgTotal}}张图片</text>
         </div>
-        <div class="ranking" v-if="truckImageData.rank != 0">
-            <div :style="{backgroundColor:'#ff8533',height:'37px',paddingRight:'10px',justifyContent:'center',alignItems:'center'}">
-                <text :style="{paddingLeft:'20px',fontSize:'24px',color:'#fff'}">牵引车第{{truckImageData.rank}}名</text>
+        <div class="ranking" v-if="truckImageData.rank">
+            <image src="https://s.kcimg.cn/wap/images/detail/productApp/rank.png" style="width:60px;height:40px"></image>
+            <div :style="{backgroundColor:'#f60',height:'40px',paddingRight:'10px',marginLeft:'-1px',justifyContent:'center',alignItems:'center'}">
+                <text :style="{fontSize:'24px',color:'#fff'}">{{truckImageData.rank}}</text>
             </div>
-            <text :style="{position:'absolute',left:'0',top:'0',fontFamily:'detail',color:'#ff8533',fontSize:'37px'}">&#x6392;</text>
-            <text :style="{position:'absolute',left:'25px',top:'5px',fontFamily:'detail',color:'#fff',fontSize:'24px'}">&#xe603;</text>
+            <!--<text :style="{position:'absolute',left:'0',top:'0',fontFamily:'detail',color:'#ff8533',fontSize:'37px'}">&#x6392;</text>-->
+            <!--<text :style="{position:'absolute',left:'25px',top:'5px',fontFamily:'detail',color:'#fff',fontSize:'24px'}">&#xe603;</text>-->
         </div>
     </div>
 </template>
 
 <script type="text/babel">
     export default {
+        data(){
+            return{
+                //空图片
+//                notImg:false
+            }
+        },
         props:{
-            truckImageData:Object
+            truckImageData:Object,
+            url:String
         },
         methods:{
-
+            goWeex(){
+                this.goWeexUrl(this.url)
+            }
         },
         created(){
+//            if(!this.truckImageData.imgSrc){
+//                this.notImg = true;
+//            }
         }
     }
 </script>
@@ -41,6 +61,17 @@
         border-top-width:20px;
         border-top-style:solid;
         border-top-color:#f5f5f5;
+    }
+    .not-img{
+        width:750px;
+        height:500px;
+        padding-bottom:150px;
+        align-items: center;
+        justify-content: flex-end;
+    }
+    .not-img-text{
+        color:#666;
+        font-size:24px;
     }
     .ranking{
         position:absolute;
@@ -75,6 +106,11 @@
     .price-text{
         font-size:32px;
         color:#fff;
+    }
+    .price-wrapper{
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
     }
     .img-total{
         font-size:24px;

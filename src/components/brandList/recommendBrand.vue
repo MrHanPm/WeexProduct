@@ -4,9 +4,11 @@
             <text class="title-text">推荐品牌</text>
         </div>
         <div class="content">
-            <div class="recommend-list" v-for="(ele,index) in recommendList" @click="SidebarShow(ele.url)">
-                <image :src="ele.img" style="width:120px;height:80px"></image>
-                <text class="recommend-text">{{ele.name}}</text>
+            <div class="recommend-list" v-for="(ele,index) in recommendList" @click="SidebarShow(ele)">
+                <image :src="ele.img?ele.img:'http://img4.kcimg.cn/imgser/' + ele.F_BrandLogo" style="width:120px;height:80px"></image>
+               <div class="recommend-name">
+                   <text class="recommend-text">{{ele.name}}</text>
+               </div>
             </div>
         </div>
     </div>
@@ -16,14 +18,17 @@
     export default {
         props:['recommendList'],
         methods:{
-            SidebarShow(url){
-               this.$emit('SidebarShow',url)
+            SidebarShow(ele){
+               this.$emit('SidebarShow',ele)
             }
         }
     }
 </script>
 
 <style scoped>
+    .recommend{
+        background-color:#fff;
+    }
     .title{
         height:60px;
         padding-left:20px;
@@ -46,18 +51,25 @@
     }
     .recommend-list{
         width:183px;
+        height:154px;
         align-items: center;
         justify-content: center;
         padding-top: 10px;
         padding-left:20px;
-        padding-bottom:20px;
+        padding-bottom:10px;
         padding-right:20px;
     }
     .recommend-list:active{
         background-color:rgba(0,0,0,.2);
     }
+    .recommend-name{
+        justify-content: center;
+        align-items: center;
+        flex-direction: row;
+        overflow: hidden;
+    }
     .recommend-text{
-        height:24px;
+        /*height:24px;*/
         margin-top:20px;
         color:#333;
         font-size:24px;

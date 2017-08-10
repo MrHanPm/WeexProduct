@@ -16,6 +16,16 @@ var bannerPlugin = new webpack.BannerPlugin(
     {raw: true}
 )
 
+var optimizePlugin = new webpack.optimize.UglifyJsPlugin({
+  compress: {
+    warnings: false
+  },
+  //保留banner
+  comments: /{ "framework": "Vue" }/,
+  sourceMap: true
+})
+
+
 function getBaseConfig() {
     return {
         entry: {
@@ -27,12 +37,30 @@ function getBaseConfig() {
             model: path.resolve('./build/model.js'),
             //车系图片页
             seriesPhoto: path.resolve('./build/seriesPhoto.js'),
+            //车型图片页
+            modelPhoto:path.resolve('./build/modelPhoto.js'),
             //车系图片详情页
             photoInfo: path.resolve('./build/photoInfo.js'),
-            //经销商页
+            //车系经销商页
             dealer: path.resolve('./build/dealer.js'),
-            //配置页
+            //车型经销商页
+            modelDealer:path.resolve('./build/modelDealer.js'),
+            //车系配置页
             config: path.resolve('./build/config.js'),
+            //车型配置页面
+            modelConfig:path.resolve('./build/modelConfig.js'),
+            //选择车系页
+            addSeries:path.resolve('./build/addSeries.js'),
+            //选择车型页
+            addProduct:path.resolve('./build/addProduct.js'),
+            //询底价
+            footerPrice:path.resolve('./build/footerPrice.js'),
+            //询底价成功页面
+            success:path.resolve('./build/success.js'),
+            //个人信息声明页
+            personalInfo:path.resolve('./build/personalInfo.js'),
+            //对比页面
+            contrast:path.resolve('./build/contrast.js')
         },
         output: {
             path: 'dist',
@@ -87,7 +115,10 @@ function getBaseConfig() {
             //   }
             // })]
         },
-        plugins: [bannerPlugin]
+        plugins: [
+            bannerPlugin,
+            optimizePlugin
+        ]
     }
 }
 

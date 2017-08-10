@@ -1,56 +1,63 @@
 <template>
-    <list class="location"><!-- @scroll="scrollContent" ref="locationWrapper"-->
-        <cell>
-            <!--头部-->
-            <div class="title">
-                <div class="back" @click="selectLocationPop">
-                    <text :style="{fontFamily:'detail',fontSize:'32px',color:'#333'}">回</text>
-                </div>
-                <div class="wrapper">
-                    <text class="title-name">选择地区</text>
-                </div>
-            </div>
 
-            <!--地区搜索-->
-            <div :class="['search-location',searching?'searching':'']">
-                <div class="search-box">
-                    <div class="search-icon">
-                        <text :style="{fontFamily:'detail',color:'#d8d8d8'}" class="search-icon-text">&#xe60c;</text>
+    <div class="location">
+            <div v-if="iosTop" class="ios-top"></div>
+            <list class="location-wrapper"><!-- @scroll="scrollContent" ref="locationWrapper"-->
+                <!--头部-->
+                <cell class="title">
+                    <div class="back" @click="selectLocationPop">
+                        <!--<text :style="{fontFamily:'detail',fontSize:'32px',color:'#333'}">回</text>-->
+                        <image src="https://s.kcimg.cn/wap/images/detail/productApp/back.png" style="width:20px;height:36px"></image>
                     </div>
-                    <input type="text" class="search-text" @input="searchLocation" @focus="onSearchFocus" ref="searchBox"/>
-                </div>
-                <div class="cancel-search" v-if="searching" @click="cancelSearch">
-                    <text class="cancel-search-text">取消</text>
-                </div>
-            </div>
-            <!--定位/常用地区-->
-            <div v-if="!searching" class="content">
-                <div class="hot-location">
+                    <div class="wrapper">
+                        <text class="title-name">选择地区</text>
+                    </div>
+                </cell>
+
+                <!--地区搜索-->
+                <cell :class="['search-location',searching?'searching':'']">
+                    <div class="search-box">
+                        <div class="search-icon">
+                            <!--<text :style="{fontFamily:'detail',color:'#d8d8d8'}" class="search-icon-text">&#x641c;</text>-->
+                            <image src="https://s.kcimg.cn/wap/images/detail/productApp/search.png" style="width:30px;height:32px"></image>
+                        </div>
+                        <input type="text" placeholder="请输入城市名称或首字母查询" :value="searchValue" class="search-text" @input="searchLocation" @focus="onSearchFocus" ref="searchBox"/>
+                    </div>
+                    <div class="cancel-search" v-if="searching" @click="cancelSearch">
+                        <text class="cancel-search-text">取消</text>
+                    </div>
+                </cell>
+                <!--定位/常用地区-->
+                <!--<div v-if="!searching" class="content">-->
+                <cell class="hot-location"  v-if="!searching">
                     <div class="hot-title">
                         <text class="hot-title-text">定位/常用</text>
                     </div>
                     <div class="hot-content">
                         <div v-for="(ele,index) in hotLocation" class="hot-location-list" @click="shortcutSelectLocation(ele)">
+                            <image v-if="myRegion && index == 0"  src="https://s.kcimg.cn/wap/images/detail/productApp/location-f60.png" style="width:20px;height:24px;margin-right:10px"></image>
+                            <!--<text v-if="myRegion && index == 0" :style="{fontFamily:'detail',color:'#f60',fontSize:'28px',marginRight:'5px'}">&#xe60a;</text>-->
                             <text class="hot-location-text">{{ele.cityName}}</text>
                         </div>
                     </div>
-                </div>
-                <div v-for="(ele,index) in locationData.list">
-                    <div class="list-title" :ref="'indexNav' + index">
+                </cell>
+                <cell v-for="(ele,index) in locationData.list"  v-if="!searching">
+                    <div class="list-title" :ref="locationData.indexNav[index]">
                         <text class="list-title-text">{{locationData.indexNav[index]}}</text>
                     </div>
                     <div class="location-list">
                         <div v-for="res in ele" class="location-model" @click="selectProvince(res.F_ProvinceName,res.F_ProvinceId)">
-                            <text :class="[res.F_ProvinceName==locationInfo.provinceName?'result-list-text-visible':'']">{{res.F_ProvinceName}}</text>
+                            <text :class="['province-name',res.F_ProvinceName==locationInfo.provinceName?'result-list-text-visible':'']">{{res.F_ProvinceName}}</text>
                         </div>
                     </div>
-                </div>
-            </div>
+                </cell>
+                    <!--</div>-->
+            </list>
             <!--搜索结果列表-->
-            <list v-else class="search-result">
+            <list v-if="searching" class="search-result">
                 <cell>
                     <div class="search-result-wrapper">
-                        <div v-for="ele in searchResult" class="result-list"  @click="shortcutSelectLocation(ele)">
+                        <div v-if="searchResult.length" v-for="ele in searchResult" class="result-list"  @click="shortcutSelectLocation(ele)">
                             <text class="result-list-text">{{ele.cityName}}</text>
                         </div>
                     </div>
@@ -64,6 +71,7 @@
             </div>
             <!--侧边栏内容-->
             <list class="sidebar-content" style="flex: 1" ref="side">
+                <cell v-if="iosTop" class="ios-top"></cell>
                 <cell class="sidebar-header" v-if="showSidebar">
                     <div class="back" @click="sidebarHide">
                         <text class="back-text">关闭</text>
@@ -76,12 +84,12 @@
                     </div>
                 </cell>
                 <cell v-if="sidebarContent.length == 0" class="empty-history">
-                    <text :style="{fontFamily:'detail',fontSize:'100px',color:'#a1c6f5'}">&#x65e0;</text>
+                    <!--<text :style="{fontFamily:'detail',fontSize:'100px',color:'#a1c6f5'}">&#x65e0;</text>-->
+                    <image src="https://s.kcimg.cn/wap/images/app_icon/bad.png" style="width:155px;height:100px;"></image>
                     <text class="empty-history-text">很遗憾~ 没有相关内容~</text>
                 </cell>
             </list>
-        </cell>
-    </list>
+        </div>
 </template>
 
 <script type="text/babel">
@@ -98,8 +106,12 @@
                 searching:false,
                 //常用地区列表
                 hotLocation:[],
+                //是否有定位地区
+                myRegion:false,
                 //已经选中的nav导航
                 indexNav:'',
+                //搜索框内容
+                searchValue:'',
                 //搜索列表结果
                 searchResult:[],
                 //搜索结果列表的高度
@@ -116,6 +128,7 @@
                     cityName:'',
                     cityId:'',
                 },
+                iosTop:false
 
             }
         },
@@ -126,11 +139,6 @@
 //                this.alert(locationWrapper.scrollTop.reachTop)
 ////                this.alert(1)
 //            },
-            alert (text) {
-                modal.alert({
-                    message: text
-                })
-            },
             //关闭选地区弹层
             selectLocationPop(){
                 this.$emit('selectLocationPop')
@@ -142,37 +150,41 @@
             //点击取消搜索
             cancelSearch(){
                 let searchBox = this.$refs.searchBox;
+                //搜索框失去焦点
                 searchBox.blur();
+                //搜索输入框置空
+                this.searchValue = '';
+                //搜索结果列表置空
+                this.searchResult = [];
+                //取消搜索状态
                 this.searching = false;
             },
             //点击城市索引导航
             anchor(index){
+               console.log(this.$refs)
                 this.indexNav = this.locationData.indexNav[index];
-                dom.scrollToElement(this.$refs['indexNav' + index][0], {offset: 0})
+                let nav = [this.locationData.indexNav[index]][0];
+                dom.scrollToElement(this.$refs[nav][0], {offset: 0})
             },
             //输入框搜索
             searchLocation(event){
-                this.getData('/index.php?r=app/series/get-search-province&value=' + event.value,(ele) => {
+                this.searchValue = event.value;
+                this.getData(this.ajaxUrl() + '/index.php?r=weex/series/get-search-region&value=' + encodeURIComponent(event.value),(ele) => {
                     if(ele.ok && ele.data.info == 'ok'){
                         this.searchResult = ele.data.data;
+//                        this.alert(JSON.stringify(this.searchResult))
 //                        ele.data.data.forEach((res,index) => {
 //                            this.$set(this.searchResult,index,ele.data.data[index]);
 //                        })
-//
                     }
                 })
             },
-            //发送请求
-            getData(repo,callback){
-                return stream.fetch({
-                    method:'GET',
-                    type:'json',
-                    url:'http://product-yufabu.m.360che.com' + repo,
-                },callback)
-            },
             //点击定位 常用地区列表
             shortcutSelectLocation(ele){
-                console.log(ele)
+                let searchBox = this.$refs.searchBox;
+                //搜索框失去焦点
+                searchBox.blur();
+
                 this.locationInfo = ele;
                 //将已选择城市数据传递给父元素
                 this.getLocationInfo();
@@ -201,7 +213,7 @@
                 });
 
                 //请求城市数据
-                this.getData('/index.php?r=app/series/city-list&provinceId=' + provinceId,(ele) => {
+                this.getData(this.ajaxUrl() + '/index.php?r=app/series/city-list&provinceId=' + provinceId,(ele) => {
                    if(ele.ok && ele.data && ele.data.status == 1){
                        this.sidebarContent = ele.data.data;
                    }else{
@@ -240,11 +252,21 @@
                                 ishave = false;
                             }
                         });
+
                         if(ishave){
                             if(data.length > 5){
-                                data.splice(1,1)
+                                //查看是否打开定位地区，如果打开，从1开始截取
+                                if(this.myRegion){
+                                    data.splice(1,1)
+                                }else{
+                                    //如果没有打开定位地区，从0开始截取
+                                    data.splice(0,1)
+                                }
+
                             }
                             data.push(this.locationInfo);
+
+                            this.hotLocation = data;
 
                             storage.setItem('hotLocation',JSON.stringify(data))
                         }
@@ -273,11 +295,40 @@
             }
         },
         created(){
+            if(weex.config.env.platform == 'iOS'){
+                this.iosTop = true;
+            }
+
             //获取常用地区列表
             storage.getItem('hotLocation',(ele) => {
                 if(ele.result == 'success'){
                     this.hotLocation = JSON.parse(ele.data)
                 }
+
+                //获取有没有定位地区
+                storage.getItem('myRegion',res => {
+                    if(res.result == 'success'){
+                        let myRegion = JSON.parse(res.data);
+                        //查看常用地区列表第一个是否是定位地区
+                        if(this.hotLocation.length){
+                            if(this.hotLocation[0].cityName != myRegion.cityName){
+                                //把定位放入到常用地区列表
+                                this.hotLocation.unshift(myRegion);
+
+                                //重新缓存常用地区列表
+                                storage.setItem('hotLocation',JSON.stringify(this.hotLocation))
+
+                            }
+                        }else{
+                            //把定位放入到常用地区列表
+                            this.hotLocation.unshift(myRegion);
+
+                            //重新缓存常用地区列表
+                            storage.setItem('hotLocation',JSON.stringify(this.hotLocation))
+                        }
+                        this.myRegion = true;
+                    }
+                })
             })
         },
         components:{
@@ -288,13 +339,20 @@
 
 <style scoped>
     .location{
-        flex: 1;
+        /*flex: 1;*/
         position:fixed;
         top:0;
         right:0;
-        bottom:0;
+        bottom:-100px;
         left:0;
         background-color:#fff;
+    }
+    .ios-top{
+        height:40px;
+        background-color: #fff;
+    }
+    .location-wrapper{
+        flex: 1;
     }
     .title{
         position:relative;
@@ -374,11 +432,12 @@
         height:70px;
         padding-top:20px;
         padding-bottom:20px;
-        background-color:rgba(0,0,0,0);
+        font-size:28px;
         border-top-width:0;
         border-right-width:0;
         border-bottom-width:0;
         border-left-width:0;
+        background-color:rgba(0,0,0,0);
     }
     .cancel-search{
         position:absolute;
@@ -400,10 +459,14 @@
         position:fixed;
         left:0;
         right:0;
-        top:183px;
+        top:220px;
         bottom:0;
+        border-top-width:20px;
+        border-top-style:solid;
+        border-top-color:#f5f5f5;
     }
     .search-result-wrapper{
+        padding-top: 20px;
         padding-left:30px;
         padding-right:30px;
     }
@@ -448,20 +511,21 @@
         margin-right:10px;
         margin-bottom:10px;
         margin-left:10px;
+        flex-direction: row;
         align-items:center;
         justify-content: center;
         border-top-width:1px;
         border-top-style: solid;
-        border-top-color:#eee;
+        border-top-color:#ddd;
         border-right-width:1px;
         border-right-style: solid;
-        border-right-color:#eee;
+        border-right-color:#ddd;
         border-bottom-width:1px;
         border-bottom-style: solid;
-        border-bottom-color:#eee;
+        border-bottom-color:#ddd;
         border-left-width:1px;
         border-left-style: solid;
-        border-left-color:#eee;
+        border-left-color:#ddd;
         border-top-left-radius: 8px;
         border-top-right-radius: 8px;
         border-bottom-left-radius: 8px;
@@ -499,6 +563,10 @@
         border-bottom-style:solid;
         border-bottom-color:#eee;
     }
+    .province-name{
+        color:#333;
+        font-size:32px;
+    }
     .location-nav{
         position:fixed;
         top:0;
@@ -530,8 +598,8 @@
         bottom: 0;
         left: 150px;
         transform: translate(750px,0);
-        background-color: #f5f5f5;
-        box-shadow: -2px 2px 2px 2px #d6d6d6;
+        background-color: #fff;
+        /*box-shadow: -2px 2px 2px 2px #d6d6d6;*/
     }
 
     .back {
@@ -544,8 +612,8 @@
         justify-content: center;
     }
     .back-text {
-        font-size: 28px;
-        color: #999;
+        color:#586C94;
+        font-size: 32px;
     }
 
     .sidebar-header {

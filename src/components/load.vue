@@ -1,7 +1,8 @@
 <template>
     <div class="loading">
         <div class="loading">
-            <text class="loading-ring" ref="load" :style="{fontFamily:'detail',fontSize:'70px',color:'#586c94'}">等</text>
+            <!--<text class="loading-ring" ref="load" :style="{fontFamily:'detail',fontSize:'70px',color:'#586c94'}">等</text>-->
+            <image src="https://s.kcimg.cn/wap/images/detail/productApp/loading.png" style="width:48px;height:48px;"></image>
             <text class="loading-text"> 正在加载更多...</text>
         </div>
     </div>

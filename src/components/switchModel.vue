@@ -1,32 +1,45 @@
 <template>
-    <scroller class="switch-model" v-if="switchModelPop">
-        <div class="title">
-            <div class="back" @click="switchModelShow">
-                <text :style="{fontFamily:'detail',fontSize:'32px',color:'#333'}">回</text>
-            </div>
-            <div class="wrapper" >
-                <text class="title-name">换车型</text>
-            </div>
-        </div>
-        <div class="options">
-            <div v-for="(ele,key) in switchModelData" v-if="typeof ele != 'string'" :class="['option',selected == key ? 'selected-option' : '']" @click="selectOption(key)">
-                <text :class="['option-text',selected == key ? 'selected-option-text' : '']">{{key}}</text>
-            </div>
-        </div>
-        <div class="switch-model-content" v-for="(ele,key) in switchModelData" v-if="typeof ele != 'string' && selected == key">
-            <div v-for="(res,index) in ele.list" class="switch-model-list" @click="switchModel(res.F_ProductId)">
-                <div class="model-name">
-                    <text :class="['model-name-text',res.F_ProductId == ProductId ? 'selected-model-name' : '']">{{res.specialProName}}</text>
+    <div class="switch-model" v-if="switchModelPop">
+        <div v-if="iosTop" class="ios-top"></div>
+        <scroller style="flex: 1" >
+            <div class="title">
+                <div class="back" @click="switchModelShow">
+                    <!--<text :style="{fontFamily:'detail',fontSize:'32px',color:'#333'}">回</text>-->
+                    <image src="https://s.kcimg.cn/wap/images/detail/productApp/back.png" style="width:20px;height:36px"></image>
                 </div>
-                <div class="tags">
-                    <div class="tags-wrapper">
-                        <text v-for="tag in res.paramDetail" class="tag">{{tag}}</text>
+                <div class="wrapper" >
+                    <text class="title-name">换车型</text>
+                </div>
+                <div v-if="all" class="all-product" @click="allProduct">
+                    <text class="all-product-text">全部车型</text>
+                </div>
+            </div>
+            <div class="options" v-if="switchModelData.attrList">
+                <div v-for="(ele,index) in switchModelData.attrList" :class="['option',selected ==  switchModelData.attrList[index] ? 'selected-option' : '']" @click="selectOption(index)">
+                    <text :class="['option-text',selected == switchModelData.attrList[index] ? 'selected-option-text' : '']">{{ele}}</text>
+                </div>
+            </div>
+            <div class="switch-model-content" v-for="(ele,index) in switchModelData.priceList" v-if="selected == switchModelData.attrList[index]">
+                <div v-for="(res,index) in ele.list" class="switch-model-list" @click="goSwitchModel(res.F_ProductId)">
+                    <!--<div class="model-name">-->
+                        <text :class="['model-name-text',res.F_ProductId == ProductId ? 'selected-model-name' : '']">{{res.specialProName}}</text>
+                    <!--</div>-->
+                    <div class="tags">
+                        <div class="tags-wrapper">
+                            <text v-for="tag in res.paramDetail" class="tag">{{tag}}</text>
+                        </div>
+                        <text class="sell-type">{{res.F_IsStopMake == 1 ? '' : res.F_IsStopMake == 4 ? '停售' : '未上市'}}</text>
                     </div>
-                    <text class="sell-type">{{res.F_IsStopMake == 1 ? '' : res.F_IsStopMake == 4 ? '停售' : '未上市'}}</text>
                 </div>
+                <div class="empty" v-if="!ele.list.length">
+                    <image src="https://s.kcimg.cn/wap/images/app_icon/bad.png" style="width:155px;height:100px;"></image>
+                    <text class="empty-text">很遗憾~ 没有相关内容~</text>
+                </div>
+                <!--v-if="switchModelData.attrList[index].length"-->
             </div>
-        </div>
-    </scroller>
+
+        </scroller>
+    </div>
 </template>
 
 <script type="text/babel">
@@ -35,7 +48,7 @@
     let storage = weex.requireModule('storage')
 
     export default {
-        props:['switchModelPop','switchModelData','ProductId','imgSwitchModel'],
+        props:['switchModelPop','switchModelData','ProductId','imgSwitchModel','all'],
         data(){
             return {
 //                //换车型数据
@@ -47,6 +60,7 @@
 //                //车型id
 //                ProductId:'',
                 selected:'',
+                iosTop:false
             }
         },
         methods:{
@@ -55,28 +69,39 @@
                     message: text
                 })
             },
-            selectOption(key){
-               this.selected = key;
+            selectOption(index){
+               this.selected = this.switchModelData.attrList[index];
             },
             //取消换车型
             switchModelShow(){
                 this.$emit('switchModelShow')
             },
+            //车系图片页点击全部车型
+            allProduct(){
+                this.$emit('allProduct')
+            },
             //点击换车型
-            switchModel(F_ProductId){
+            goSwitchModel(F_ProductId){
+                this.$emit('goSwitchModel',F_ProductId)
+
                 //图片页面换车型
-                if(this.imgSwitchModel){
-                    this.$emit('switchModel',F_ProductId)
-                }else{//车型页面换车型
-                    storage.setItem('ProductId',F_ProductId,ele => {
-                        if(ele.result == 'success'){
-                            this.goWeexUrl('model.weex.js')
-                        }
-                    })
-                }
+//                if(this.imgSwitchModel){
+//                    this.$emit('switchModel',F_ProductId)
+//                }else{//车型页面换车型
+//                    storage.setItem('ProductId',F_ProductId,ele => {
+//                        if(ele.result == 'success'){
+//                            this.goWeexUrl('model.weex.js')
+//                        }
+//                    })
+//                }
             }
         },
         created(){
+            if(weex.config.env.platform == 'iOS'){
+                this.iosTop = true;
+//                this.alert(this.iosTop)
+            }
+
             this.selected = this.switchModelData.paramName;
 //            //获取车系信息
 //            storage.getItem('seriesInfo',seriesInfo => {
@@ -125,9 +150,13 @@
         position:fixed;
         top:0;
         right:0;
-        bottom:0;
+        bottom:-100px;
         left:0;
         background-color:#fff;
+    }
+    .ios-top{
+        height:40px;
+        background-color: #fff;
     }
     .title{
         position:relative;
@@ -153,6 +182,18 @@
         padding-right:20px;
         color:#333;
         font-size:36px;
+    }
+    .all-product{
+        position:absolute;
+        right:30px;
+        top:0;
+        height:90px;
+        justify-content: center;
+        align-items: center;
+    }
+    .all-product-text{
+        color: #586c94;
+        font-size: 28px;
     }
     .back{
         position:absolute;
@@ -218,6 +259,9 @@
         border-top-color:#eee;
     }
     .switch-model-list{
+        flex: 1;
+        justify-content: center;
+        align-items: flex-start;
         padding-top:30px;
         padding-right:30px;
         padding-bottom:30px;
@@ -225,6 +269,9 @@
         border-bottom-width:1px;
         border-bottom-style:solid;
         border-bottom-color:#eee;
+    }
+    .switch-model-list:active{
+        background-color: rgba(0,0,0,.3);
     }
     .model-name{
         display: flex;
@@ -235,11 +282,19 @@
     .model-name-text{
         color: #333;
         font-size: 28px;
+        /*-webkit-box-orient: vertical;*/
+        /*text-overflow: ellipsis;*/
+        /*display: -webkit-box;*/
+        /*-webkit-line-clamp: 1;*/
+        /*overflow: hidden;*/
+        /*lines: 1;*/
+        flex-wrap: wrap;
     }
     .selected-model-name{
         color:#586c94;
     }
     .tags{
+        width:600px;
         margin-top: 10px;
         flex-direction:row;
         justify-content: space-between;
@@ -255,5 +310,15 @@
     .sell-type{
         color: #f60;
         font-size:24px;
+    }
+    .empty{
+        flex: 1;
+        justify-content: center;
+        align-items: center;
+    }
+    .empty-text{
+        margin-top: 20px;
+        color:#666;
+        font-size:28px;
     }
 </style>

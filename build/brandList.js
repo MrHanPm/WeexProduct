@@ -1,4 +1,4 @@
-import BrandList from '../src/views/BrandList.vue'
+import BrandList from '../src/views/brandList.vue'
 import mixins from '../src/mixins'
 
 Vue.mixin(mixins);

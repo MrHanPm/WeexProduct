@@ -27,11 +27,10 @@
                 alert(1)
             },
             anchor(index){
-                let _this = this;
                 this.indicateText = index;
                 this.indicateShow = true;
-                let time = setTimeout(function(){
-                    _this.indicateShow = false;
+                let time = setTimeout(() => {
+                    this.indicateShow = false;
                     clearTimeout(time)
                 },500);
                 this.$emit('anchor',index);

@@ -1,19 +1,20 @@
 <template>
-    <div class="parameter-config">
+    <div class="parameter-config" v-if="parameterData.length">
         <sub-title subTitleName="参数配置"></sub-title>
         <div class="content">
-            <div v-for="ele in parameterData" class="parameter-list">
+            <div v-for="(ele,index) in parameterData" class="parameter-list" v-if="index < 6 && ele.value != '' && ele.value != 0">
                 <div class="key">
                     <text class="key-text">{{ele.F_ParameterName}}</text>
                 </div>
                 <div class="value">
-                    <text class="value-text">{{ele.value}}</text>
+                    <text class="value-text">{{ele.value + ele.unit}}</text>
                 </div>
             </div>
         </div>
-        <div class="load-more" @click="goUrl(moreParamUrl)">
+        <div class="load-more" @click="goWeexUrl('modelConfig.weex.js')">
             <text class="load-more-text">查看详细参数配置</text>
-            <text :style="{fontFamily:'detail',fontSize:'24px',color:'#999'}">&#x53bb;</text>
+            <image src="https://s.kcimg.cn/wap/images/detail/productApp/footer-go.png" alt="" style="width:16px;height:28px;"></image>
+            <!--&lt;!&ndash;<text :style="{fontFamily:'detail',fontSize:'24px',color:'#999'}">&#x53bb;</text>&ndash;&gt;-->
         </div>
     </div>
 </template>

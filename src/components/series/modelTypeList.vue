@@ -3,53 +3,53 @@
         <div class="subtitle">
             <div class="title-name">
                 <text class="subtitle-text">车型报价</text>
-                <div class="sell-state-sum" v-for="ele in modelList" v-if="ele.total > 0 && sellState == ele.name">
+                <div class="sell-state-sum" v-for="(ele,index) in modelList" v-if="sellState == index">
                     <text :style="{fontSize:'24px',color:'#999'}">共</text>
-                    <text :style="{fontSize:'24px',color:'#f60'}">{{ele.total}}</text>
-                    <text :style="{fontSize:'24px',color:'#999'}"> 款{{ele.name}}车型</text>
+                    <text :style="{fontSize:'24px',color:'#f60',marginLeft:'10px',marginRight:'5px'}">{{ele.total}}</text>
+                    <text :style="{fontSize:'24px',color:'#999'}"> 款{{ele.status}}车型</text>
                 </div>
             </div>
             <!--在售 || 未发布 || 停售-->
             <div class="sell-state">
-                <div :class="['sell-state',sellState == ele.name ? 'sell-state-visible' : '']" v-for="ele in modelList" v-if="ele.total > 0" @click="selectSellState(ele.name)">
+                <div :class="['sell-state',sellState == index ? 'sell-state-visible' : '']" v-for="(ele,index) in modelList" v-if="ele.list.length > 0" @click="selectSellState(index)">
                     <keep-alive>
-                        <text :class="['sell-state-text',sellState == ele.name ? 'sell-state-text-visible' : '']">{{ele.name}}</text>
+                        <text :class="['sell-state-text',sellState == index ? 'sell-state-text-visible' : '']">{{ele.status}}</text>
                     </keep-alive>
                 </div>
             </div>
         </div>
         <!--数据列表-->
-        <div v-for="(ele,index) in modelList" v-if="sellState == ele.name" class="content">
+        <div v-for="(ele,index) in modelList" class="content" v-if="sellState == index">
             <div class="options">
-                <div v-for="(res,key) in ele.list" :class="['option',optionState[index] == key ? 'option-visible' : '',optionNumber == 3 ? 'long-option' : 'short-option']" @click="selectOption(key,index)">
-                    <text :class="['option-test',optionState[index] == key ? 'option-test-visible' : '' ]">{{key}}</text>
+                <div v-for="(res,number) in ele.list" :class="['option',optionState[index] == ele.attrKey[number] ? 'option-visible' : '',optionNumber == 3 ? 'long-option' : 'short-option']" @click="selectOption(index,number)">
+                    <text :class="['option-test',optionState[index] == ele.attrKey[number] ? 'option-test-visible' : '' ]">{{ele.attrKey[number] == 10 ? '底盘' : ele.attrKey[number]}}</text>
                 </div>
             </div>
-            <div class="wrapper">
-                <div v-for="(res,key) in ele.list" v-if="optionState[index] == key">
-                    <div v-for="(data,index) in res" class="model-list" v-if="index < modelListNumber" @click="goInfo(data)"><!---->
+            <div class="wrapper" v-for="(res,key) in ele.list" v-if="optionState[index] == ele.attrKey[key]">
+                    <div v-for="(data,index) in res" class="model-list" v-if="index < modelListNumber" @click="goModelInfo(data,'model.weex.js')"><!---->
                         <div class="truck-info">
                             <div class="truck-name">
                                 <text v-if="data.hotLocation" class="truck-name-tag">{{data.hotLocation}}</text>
-                                <text class="truck-name-text">{{data.speaclProName.replace(' ','')}}</text>
+                                <text class="truck-name-text">{{data.speaclProName}}</text>
                             </div>
                             <div class="guide-price">
                                 <text v-if="data.priceScope" class="guide-price-text">厂商指导价：{{data.priceScope}}</text>
-                                <text v-else="" class="guide-price-text">厂商指导价：{{data.F_Price != 0 ? data.F_Price : '暂无'}}</text>
+                                <text v-else="" class="guide-price-text">厂商指导价：{{data.F_Price != 0 ? data.F_Price + data.F_PriceUnit : '暂无'}}</text>
                                 <div class="tags">
                                     <text v-for="tag in data.paramDetail" class="tag-text">{{tag}}</text>
                                 </div>
                             </div>
                             <div class="action">
-                                <div class="">
+                                <div class="" @click="goModelInfo(data,'modelDealer.weex.js')">
                                     <text class="hot-price">{{data.hotPrice}}</text>
                                 </div>
                                 <div class="action-wrapper">
                                     <div class="comparison" @click="compare(data.F_ProductId)">
-                                        <text v-if="!compareState[data.F_ProductId]" :style="{fontFamily:'detail',fontSize:'26px',color:'#586c94',marginRight:'5px'}">&#x52a0;</text>
-                                        <text class="comparison-text">{{compareState[data.F_ProductId] ? compareState[data.F_ProductId] : '加入'}}</text>
+                                        <!--<text v-if="!compareState[data.F_ProductId]" :style="{fontFamily:'detail',fontSize:'26px',color:'#586c94',marginRight:'5px'}">&#x52a0;</text>-->
+                                        <image v-if="!compareState[data.F_ProductId]" src="https://s.kcimg.cn/wap/images/detail/productApp/add.png" style="width:16px;height:16px;margin-right:5px"></image>
+                                        <text class="comparison-text">{{compareState[data.F_ProductId] ? compareState[data.F_ProductId] : '对比'}}</text>
                                     </div>
-                                    <div class="floor-price" @click="goInfo(data.askUrl)">
+                                    <div class="floor-price" @click="goModelInfo(data,'footerPrice.weex.js')">
                                         <text class="floor-price-text">询底价</text>
                                     </div>
                                 </div>
@@ -58,12 +58,12 @@
                     </div>
                     <div class="load-more" v-if="res.length > modelListNumber" @click="loadMore">
                         <text class="load-more-text">加载更多</text>
-                        <text :style="{fontFamily:'detail',fontSize:'28px',color:'#999'}">&#x4e0b;</text>
+                        <!--<text :style="{fontFamily:'detail',fontSize:'28px',color:'#999'}">&#x4e0b;</text>-->
+                        <image src="https://s.kcimg.cn/wap/images/detail/productApp/more.png" style="width:24px;height:14px"></image>
                     </div>
-                </div>
             </div>
         </div>
-        <div :class="['compare',compareNumber == 0 ? 'compare-hide' : '']" ref="compare" @click="goCompare(compareUrl)">
+        <div :class="['compare',compareNumber == 0 ? 'compare-hide' : '']" ref="compare" @click="goCompare">
             <text class="compare-text">对比  ({{compareNumber}})</text>
         </div>
     </div>
@@ -76,7 +76,7 @@
     let storage = weex.requireModule('storage');
     let animation = weex.requireModule('animation');
     export default {
-        props:['seriesInfo','locationInfo'],
+        props:['seriesInfo','locationInfo','el'],
         data(){
             return {
                 //车系ID
@@ -97,8 +97,6 @@
                 compareState:{
 
                 },
-                //对比要跳转过去的url
-                compareUrl:'',
                 //对比的数量
                 compareNumber:'',
                 //存储的对比数据
@@ -106,12 +104,6 @@
             }
         },
         methods:{
-            alert (text) {
-                modal.alert({
-                    message: text,
-                    duration: 0.3
-                })
-            },
             //发送请求
             getData(url,callback){
                 return stream.fetch({
@@ -120,13 +112,12 @@
                     url:url
                 },callback)
             },
-            selectSellState(state){
-                this.sellState = this.sellState == state ? this.sellState : state;
+            selectSellState(index){
+                this.sellState = index;
             },
             //选择当前状态 4*2 || 6*2 || 6*4
-            selectOption(key,index){
-                this.$set(this.optionState,index,key)
-                this.modelListNumber = 10;
+            selectOption(index,number){
+                this.$set(this.optionState,index,this.modelList[index].attrKey[number])
             },
             //点击展开更多车型
             loadMore(){
@@ -149,10 +140,10 @@
                                         this.compareNumber--;
 
                                         //如果还剩下一个对比
-                                        if(data[this.seriesId][0]){
-                                            //对比的链接
-                                            this.compareUrl = 'http://product.m.360che.com/contrast/' + data[this.seriesId][0] + '/';
-                                        }
+//                                        if(data[this.seriesId][0]){
+//                                            //对比的链接
+//                                            this.compareUrl = 'http://product.m.360che.com/contrast/' + data[this.seriesId][0] + '/';
+//                                        }
                                     }
                                 });
                                 //再次存储
@@ -160,26 +151,84 @@
                                     this.$set(this.compareState,id,'')
                                 })
                             }else{//加入
-                                if(data[this.seriesId].length >= 2){
+                                if(data[this.seriesId].length >= 2 || this.compareNumber == 2){
                                     this.alert('只能对比两款车型')
-                                }else{
-                                    data[this.seriesId].push(id);
-                                    //添加对比的数量
-                                    this.compareNumber++;
 
-                                    //判断现在对比的数量有几个
-                                    if(data[this.seriesId].length == 2){
-                                        //对比的链接
-                                        this.compareUrl = 'http://product.m.360che.com/contrast/' + data[this.seriesId][0] + '_' + data[this.seriesId][1] + '/';
-                                    }else{
-                                        //对比的链接
-                                        this.compareUrl = 'http://product.m.360che.com/contrast/' + data[this.seriesId][0] + '/';
+                                    //判断当前状态是否只有一个 && 更新当前存储
+                                    if(this.compareNumber < 2){
+                                        //获取最新缓存
+                                        storage.getItem('compareTask',compareTask => {
+                                            if(compareTask.result == 'success'){
+                                                let compareTaskData = JSON.parse(compareTask.data);
+                                                if(compareTaskData[this.seriesId].length){
+                                                    compareTaskData[this.seriesId].forEach((e,i) => {
+                                                        this.$set(this.compareState,e,'已加入')
+                                                    })
+                                                }
+                                            }
+                                        })
+                                        this.compareNumber = 2;
                                     }
-                                    //再次存储
-                                    storage.setItem('compareTask',JSON.stringify(data),() => {
-                                        this.$set(this.compareState,id,'已加入')
-                                    })
+                                }else{
+                                    if(data[this.seriesId].length == 0 && (this.compareNumber == 2 || this.compareNumber == 1)){
+                                        this.compareNumber = 0;
+                                        this.compareState  = {};
+                                        for(let key in this.compareState){
+                                            data[this.seriesId].push(key)
+                                            this.compareNumber++;
+                                        }
 
+                                        //再次存储
+                                        storage.setItem('compareTask',JSON.stringify(data),() => {
+                                            this.$set(this.compareState,id,'已加入')
+                                        })
+
+                                        if(data[this.seriesId].length >= 2){
+                                            return
+                                            this.alert('只能对比两款车型')
+                                        }
+                                    }
+
+                                    //若是车型添加对比，返回车系页
+                                    if(data[this.seriesId].length == 1 && this.compareNumber == 0){
+                                        if(data[this.seriesId][0] == id){
+                                            this.$set(this.compareState,id,'已加入')
+                                            this.compareNumber = 1;
+                                            return;
+                                        }else{
+                                            data[this.seriesId].push(id);
+                                            this.compareNumber = data[this.seriesId].length;
+
+                                            //再次存储
+                                            storage.setItem('compareTask',JSON.stringify(data),() => {
+                                                this.$set(this.compareState,id,'已加入')
+                                            })
+                                            data[this.seriesId].forEach((e,i) => {
+                                                this.$set(this.compareState,e,'已加入')
+                                            })
+                                        }
+                                    }else{
+                                        data[this.seriesId].push(id);
+                                        //添加对比的数量
+                                        this.compareNumber++;
+
+                                        //再次存储
+                                        storage.setItem('compareTask',JSON.stringify(data),() => {
+                                            this.$set(this.compareState,id,'已加入')
+                                        })
+
+                                        storage.getItem('compareTask',compareTask => {
+                                            if(compareTask.result == 'success'){
+                                                let compareTaskData = JSON.parse(compareTask.data);
+                                                if(compareTaskData[this.seriesId].length != this.this.compareNumber){
+                                                    compareTaskData[this.seriesId].forEach((e,i) => {
+                                                        this.$set(this.compareState,e,'已加入')
+                                                    })
+                                                    this.compareNumber = compareTaskData[this.seriesId].length
+                                                }
+                                            }
+                                        })
+                                    }
                                 }
                             }
 
@@ -191,7 +240,7 @@
                             //加入对比
                             this.$set(this.compareState,id,'已加入');
                             //对比的链接
-                            this.compareUrl = 'http://product.m.360che.com/contrast/' + id + '/';
+//                            this.compareUrl = 'http://product.m.360che.com/contrast/' + id + '/';
                             storage.setItem('compareTask',JSON.stringify(data))
                         }
                     }else{
@@ -207,104 +256,165 @@
                         //加入对比
                         this.$set(this.compareState,id,'已加入');
                         //对比的链接
-                        this.compareUrl = 'http://product.m.360che.com/contrast/' + id + '/';
+//                        this.compareUrl = 'http://product.m.360che.com/contrast/' + id + '/';
                         storage.setItem('compareTask',JSON.stringify(compareTask))
                     }
                 });
             },
-            //url跳转
-            goInfo(ele){
-                //判断是直接跳转还是存储跳转
-                if(typeof ele != 'string'){
-                    //存储车型id
-                    storage.setItem('ProductId',ele.F_ProductId,(ele) => {
+            //点击车型列表 跳转到车型页面
+            //点击车型列表询底价 跳转到车型询底价页面
+            //点击车型列表价格  跳转到车型经销商页面
+            goModelInfo(ele,url){
+                //显示加载loading
+//                    this.showLoading();
+                if(url == 'footerPrice.weex.js'){
+                    //进入询底价页面 && 发送统计事件
+//                    this.GA(0,ele.F_ProductId)
+                    this.eventGa(weex.config.deviceId,'点击询底价按钮',this.el,'车型区块')
+                    storage.setItem('priceProductId',ele.F_ProductId,(ele) => {
                         //跳转
-                        this.goWeexUrl('Model.weex.js');
+                        this.goWeexUrl(url);
                     });
                 }else{
-                    //直接跳转
-                    this.goUrl(ele);
+                    storage.setItem('ProductId',ele.F_ProductId,(ele) => {
+                        //跳转
+                        this.goWeexUrl(url);
+                    });
                 }
 
             },
-            //点击对比，跳转对比链接
-            goCompare(compareUrl){
-                this.compareState = {};
-                //对比要跳转过去的url
-                this.compareUrl = '';
-                //对比的数量
-                this.compareNumber = '';
-                //存储的对比数据
-                this.compareTask = {};
-                storage.getItem('compareTask',(ele) => {
+            //点击对比，跳转对比页面
+            goCompare(){
+                //读取对比信息
+                storage.getItem('compareTask',ele => {
                     if(ele.result == 'success'){
-                        let compareTask = JSON.parse(ele.data);
-                        if(compareTask[this.seriesId]){
-                            compareTask[this.seriesId] = [];
-                        }
-                        storage.setItem('compareTask',JSON.stringify(compareTask),() => {
-                            this.goUrl(compareUrl);
-                        })
-                    }
-                })
-            },
-            //请求地区热门车型
-            getHotModel(){
-                let DEV = 'http://cui.product.kache.com';
-                let BUILD = 'http://product-yufabu.360che.com';
-                let DBUG = false;
-                let ajaxUrl = DBUG ? DEV : BUILD;
-                //请求地区热门车型
-                this.getData(ajaxUrl + '/index.php?r=app/series/district-price&subCateId=' +  this.seriesInfo.F_SubCategoryId + '&seriesId=' + this.seriesInfo.F_SeriesId + '&proId=' + this.seriesInfo.proid + '&provinceId=' + this.locationInfo.provinceId + '&cityId=' + this.locationInfo.cityId,(res) => {
-                    if(res.ok){
-                        this.hotModelList = res.data;
-                        console.log(this.hotModelList,'this.hotModelList')
-                        //循环最外层标签
-                        this.modelList.forEach((ele, index) => {
-                            //如果数据的内容不为空
-                            if(this.modelList[index].total > 0){
-                                for(let key in this.modelList[index].list) {
-                                    //循环总列表
-                                    this.modelList[index].list[key].forEach((data,number) => {
-                                        //重置热门地区和报价
-                                        this.$set(this.modelList[index].list[key][number],'hotLocation','');
-                                        this.$set(this.modelList[index].list[key][number],'hotPrice','');
+                        //缓存对比需要的信息
+                        storage.setItem('compareData',ele.data,res => {
+                            if(res.result == 'success'){
 
-                                        //循环热门车型报价
-                                        if(this.hotModelList){
-                                            this.hotModelList.forEach((hot,i) => {
-                                                //如果id相等
-                                                if(data.F_ProductId == hot.productId){
-                                                    //赋值价格
-                                                    this.$set(this.modelList[index].list[key][number],'hotPrice',hot.price);
-                                                    //是热门
-                                                    if(hot.hot && hot.hot == 1){
-                                                        this.$set(this.modelList[index].list[key][number],'hotLocation','[' + this.locationInfo.cityName + '热门]');
-                                                    }
-                                                    let hotprice = this.modelList[index].list[key].splice(number,'1')[0];
-                                                    this.modelList[index].list[key].unshift(hotprice)
-                                                }
-                                            })
-                                        }
-                                    })
+                                //删除对比信息
+                                let data = JSON.parse(ele.data);
+                                if(data[this.seriesId]){
+                                    data[this.seriesId] = [];
                                 }
+                                //重置对比信息
+                                this.compareState = {};
+                                this.compareNumber = 0;
+
+                                //重新缓存
+                                storage.setItem('compareTask',JSON.stringify(data),success => {
+                                    if(success.result == 'success'){
+                                        //成功跳转对比页面
+                                        this.goWeexUrl('contrast.weex.js');
+                                    }
+                                })
                             }
                         })
                     }
+                })
+//                this.compareState = {};
+//                //对比要跳转过去的url
+//                this.compareUrl = '';
+//                //对比的数量
+//                this.compareNumber = '';
+//                //存储的对比数据
+//                this.compareTask = {};
+//                storage.getItem('compareTask',(ele) => {
+//                    if(ele.result == 'success'){
+//                        let compareTask = JSON.parse(ele.data);
+//                        if(compareTask[this.seriesId]){
+//                            compareTask[this.seriesId] = [];
+//                        }
+//                        storage.setItem('compareTask',JSON.stringify(compareTask),() => {
+//                            this.goUrl(compareUrl);
+//                        })
+//                    }
+//                })
+            },
+            //请求地区热门车型
+            getHotModel(clear){
+
+                //请求地区热门车型
+                this.getData(this.ajaxUrl() + '/index.php?r=weex/series/district-price&subCateId=' +  this.seriesInfo.F_SubCategoryId + '&seriesId=' + this.seriesInfo.F_SeriesId + '&proId=' + this.seriesInfo.proid + '&provinceId=' + this.locationInfo.provinceId + '&cityId=' + this.locationInfo.cityId,(res) => {
+                    if(res.ok){
+                        this.hotModelList = res.data;
+
+                        if(clear){
+                            //循环最外层标签
+                            this.modelList.forEach((ele, index) => {
+                                //如果数据的内容不为空
+                                if (this.modelList[index].list.length > 0) {
+                                    this.modelList[index].list.forEach((key, keyNum) => {
+                                        //循环总列表
+                                        this.modelList[index].list[keyNum].forEach((data, number) => {
+                                            //重置热门地区和报价
+                                            this.$set(this.modelList[index].list[keyNum][number], 'hotLocation', '');
+                                            this.$set(this.modelList[index].list[keyNum][number], 'hotPrice', '');
+                                        })
+                                    })
+                                }
+                            })
+                        }
+
+                        //循环热门车型报价
+                        if (this.hotModelList) {
+                            this.hotModelList.forEach((hot, i) => {
+                                //循环最外层标签
+                                this.modelList.forEach((ele, index) => {
+                                    //如果数据的内容不为空
+                                    if (this.modelList[index].list.length > 0) {
+                                        this.modelList[index].list.forEach((key, keyNum) => {
+                                            //循环总列表
+                                            this.modelList[index].list[keyNum].forEach((data, number) => {
+
+                                                //如果id相等
+                                                if (data.F_ProductId == hot.productId) {
+
+                                                    let unit = '起';
+
+                                                    if (hot.hot == 1) {
+                                                        unit = '';
+                                                        //是热门
+                                                        this.$set(this.modelList[index].list[keyNum][number], 'hotLocation', '[' + this.locationInfo.cityName.split('市')[0] + '热门]');
+                                                    }
+
+                                                    //赋值价格
+                                                    this.$set(this.modelList[index].list[keyNum][number], 'hotPrice', hot.price + unit);
+
+                                                    let hotprice = this.modelList[index].list[keyNum].splice(number, '1')[0];
+
+                                                    this.modelList[index].list[keyNum].unshift(hotprice)
+
+                                                }
+                                            })
+                                        })
+                                    }
+                                })
+                            })
+                        }
+                    }
                 });
+            },
+            //点击价格跳转到车型经销商
+            goModelDealer(ele){
+                console.log(ele)
             }
         },
         created(){
-            let DEV = 'http://cui.product.kache.com';
-            let BUILD = 'http://product-yufabu.360che.com';
-            let DBUG = false;
-            let ajaxUrl = DBUG ? DEV : BUILD;
             //查看屏幕分辨率，判断车型列表选项一行的个数
             if(weex.config.deviceWidth <= 320){
                 this.optionNumber = 3;
             };
+
+            //获取对比存储数据
+            storage.getItem('compareTask',(comper) => {
+                if(comper.result == 'success'){
+                    this.compareTask = JSON.parse(comper.data);
+                }
+            });
+
             //请求车型列表数据
-            this.getData(ajaxUrl + '/index.php?r=app/series/price&subCateId=' + this.seriesInfo.F_SubCategoryId + '&seriesId=' + this.seriesInfo.F_SeriesId + '&proId=' + this.seriesInfo.proid,(ele) => {
+            this.getData(this.ajaxUrl() + '/index.php?r=weex/series/price&subCateId=' + this.seriesInfo.F_SubCategoryId + '&seriesId=' + this.seriesInfo.F_SeriesId + '&proId=' + this.seriesInfo.proid,(ele) => {
                 if(ele.ok){
                     //给车型列表赋值
                     this.modelList = ele.data;
@@ -316,16 +426,9 @@
                     //默认显示状态 在售 || 未上市 || 停售
                     let ishave = true;
                     this.modelList.forEach((ele,index) => {
-                        if(this.modelList[index].total > 0 && ishave){
-                            this.sellState = this.modelList[index].name;
+                        if(this.modelList[index].list.length > 0 && ishave){
+                            this.sellState = index;
                             ishave = false;
-                        }
-                    });
-
-                    //获取对比存储数据
-                    storage.getItem('compareTask',(comper) => {
-                        if(comper.result == 'success'){
-                            this.compareTask = JSON.parse(comper.data);
                         }
                     });
 
@@ -335,60 +438,46 @@
                     //循环最外层标签
                     this.modelList.forEach((ele,index) => {
                         islongest = true;
-                        //如果数据的内容不为空
-                        if(this.modelList[index].total > 0){
+                        //循环状态下的list
+                        this.modelList[index].list.forEach((key, number) => {
+                            //定义状态，只循环一次，用第一条数据逐个对比之后的数据
+                            if (islongest) {
+                                islongest = false;
 
-                            //循环状态下的list
-                            for(let key in this.modelList[index].list){
-                                //定义状态，只循环一次，用第一条数据逐个对比之后的数据
-                                if(islongest){
-                                    islongest = false;
-
-                                    //当车系id为空的时候 获取车系id并赋值
-                                    if(!this.seriesId){
-                                        this.seriesId = this.modelList[index].list[key][0].F_SubCategoryId;
-
-                                        //获取存储对比数据 && 给元素赋值
-                                        if (this.compareTask[this.seriesId]) {
-                                            //获取对比的数量
-                                            this.compareNumber = this.compareTask[this.seriesId].length;
-                                            //循环存储的对比数据，渲染数据
-                                            this.compareTask[this.seriesId].forEach((res,index) => {
-                                                this.$set(this.compareState, res, '已加入')
-                                            })
-
-                                            //判断现在对比的数量有几个
-                                            if (this.compareTask[this.seriesId].length == 2) {
-                                                //对比的链接
-                                                this.compareUrl = 'http://product.m.360che.com/contrast/' + this.compareTask[this.seriesId][0] + '_' + this.compareTask[this.seriesId][1] + '/';
-                                            } else {
-                                                //对比的链接
-                                                this.compareUrl = 'http://product.m.360che.com/contrast/' + this.compareTask[this.seriesId][0] + '/';
-                                            }
-                                        }
-                                    }
-
-                                    //默认取第一条数据的length
-                                    longest = this.modelList[index].list[key];
-                                    //默认取第一条数据的key
-                                    this.$set(this.optionState,index,key)
-
-                                    //二次循环，去一一对比
-                                    for(let k in this.modelList[index].list){
-                                        //如果小于后面的length
-                                        if(longest.length < this.modelList[index].list[k].length){
-
-                                            //取后面的length比较长的数据
-                                            longest = this.modelList[index].list[k]
-                                            this.$set(this.optionState,index,k)
-                                        }
-                                    }
+                                //当车系id为空的时候 获取车系id并赋值
+                                if (!this.seriesId) {
+                                    this.seriesId = key[0].F_SubCategoryId;
                                 }
 
-                            }
-                        }
-                    });
+                                //获取存储对比数据 && 给元素赋值
+                                if (this.compareTask[this.seriesId]) {
+                                    //获取对比的数量
+                                    this.compareNumber = this.compareTask[this.seriesId].length;
+                                    //循环存储的对比数据，渲染数据
+                                    this.compareTask[this.seriesId].forEach((res, index) => {
+                                        this.$set(this.compareState, res, '已加入')
+                                    })
+                                }
 
+                                //默认取第一条数据的length
+                                longest = this.modelList[index].list[number];
+                                //默认取第一条数据的key
+                                this.$set(this.optionState, index, this.modelList[index].attrKey[number])
+
+                                //二次循环，去一一对比
+                                this.modelList[index].list.forEach((k, kNum) => {
+                                    //如果小于后面的length
+                                    if (this.modelList[index].attrKey[kNum] != 10) {
+                                        if (longest.length < this.modelList[index].list[kNum].length) {
+                                            //取后面的length比较长的数据
+                                            longest = this.modelList[index].list[kNum]
+                                            this.$set(this.optionState, index, this.modelList[index].attrKey[kNum])
+                                        }
+                                    }
+                                })
+                            }
+                        })
+                    });
                 }
             });
         },
@@ -418,7 +507,7 @@
             locationInfo:{
                 //当地区发生变化的时候 请求调取热门地区
                 handler(){
-                    this.getHotModel();
+                    this.getHotModel(true);
                 },
                 deep: true,
             }
@@ -443,6 +532,8 @@
     }
     .title-name{
         flex-direction: row;
+        justify-content: center;
+        align-items: center;
     }
     .subtitle-text{
         color:#333;
@@ -459,7 +550,9 @@
         margin-left:10px;
         flex-direction:row;
         align-items: center;
-        border-bottom-width: 0;
+        border-bottom-width: 2px;
+        border-bottom-style: solid;
+        border-bottom-color: #fff;
     }
     .sell-state-text{
         font-size:28px;
@@ -509,6 +602,12 @@
         border-top-right-radius:8px;
         border-bottom-left-radius:8px;
         border-bottom-right-radius:8px;
+        -webkit-box-orient: vertical;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        overflow: hidden;
+        lines: 1;
     }
     .long-option{
         width:223px;
@@ -525,6 +624,12 @@
     .option-test{
         color:#333;
         font-size:24px;
+        -webkit-box-orient: vertical;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        overflow: hidden;
+        lines: 1;
     }
     .option-test-visible{
         color:#586c94;
@@ -572,7 +677,10 @@
         font-size:24px;
     }
     .tags{
+        margin-bottom:-4px;
         flex-direction:row;
+        justify-content: center;
+        align-items: center;
     }
     .tag-text{
         margin-left:15px;
