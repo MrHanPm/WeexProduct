@@ -478,9 +478,7 @@
                 this.getData(`https://product.360che.com/index.php?r=weex/series/price-list&subId=${this.seriesInfo.F_SubCategoryId}&seriesId=${this.seriesInfo.F_SeriesId}`, ele => {
                     if (ele.ok) {
                         // 默认是在售状态
-                        this.sellState = 0
-                        this.model = ele.data
-                        this.isTruck = ele.data.isTruck
+                        [this.sellState, this.model, this.isTruck] = [0, ele.data, ele.data.isTruck]
                     }
                 })
             },
