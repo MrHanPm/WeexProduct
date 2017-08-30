@@ -364,7 +364,7 @@
             examineSimilar(){
                 //锚点跳转到全部相似车型
                 let examine = this.$refs['examine'];
-                dom.scrollToElement(examine, {offset: 0})
+                dom.scrollToElement(examine, {offset: -68})
                 // dom.scrollToElement(this.$refs['examine'][0], {offset: 0})
 
                 // 遍历删选条件 如果有条件就不显示所有数据

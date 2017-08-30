@@ -47,46 +47,47 @@ export default {
         //跳入到weex页面
         goWeexUrl(url) {
             //如果是苹果 点击的时候显示弹层，之后在去掉
-            if (weex.config.env.platform == 'iOS') {
+            if (weex.config.env && weex.config.env.platform == 'iOS') {
                 this.showLoading()
             }
             //查看版本号
-            storage.getItem('versions', res => {
-                if (res.result == 'success') {
-                    this.getData("https://s.kcimg.cn/wap/js/appProduct/" + res.data + "/" + url, ele => {
-                        if (ele.statusText == 'OK') {
-                            navigator.push({
-                                url: "https://s.kcimg.cn/wap/js/appProduct/" + res.data + "/" + url,
-                                animated: 'true'
-                            }, () => {
-                                //隐藏加载loading
-                                this.hideLoading()
-                            })
-                        } else {
-                            this.alert('网络错误')
-                                //隐藏加载loading
-                            this.hideLoading()
-                        }
-                    })
-                }
-            })
-
-            // this.getData("http://192.168.1.145:8080/dist/" + url, ele => {
-            //     // this.alert(JSON.stringify(ele))
-            //     if (ele.statusText == 'OK') {
-            //         navigator.push({
-            //             url: "http://192.168.1.145:8080/dist/" + url,
-            //             animated: 'true'
-            //         }, () => {
-            //             //隐藏加载loading
-            //             this.hideLoading()
+            // storage.getItem('versions', res => {
+            //     if (res.result == 'success') {
+            //         this.getData("https://s.kcimg.cn/wap/js/appProduct/" + res.data + "/" + url, ele => {
+            //             if (ele.statusText == 'OK') {
+            //                 navigator.push({
+            //                     url: "https://s.kcimg.cn/wap/js/appProduct/" + res.data + "/" + url,
+            //                     animated: 'true'
+            //                 }, () => {
+            //                     //隐藏加载loading
+            //                     this.hideLoading()
+            //                 })
+            //             } else {
+            //                 this.alert('网络错误')
+            //                     //隐藏加载loading
+            //                 this.hideLoading()
+            //             }
             //         })
-            //     } else {
-            //         this.alert('网络错误')
-            //             //隐藏加载loading
-            //         this.hideLoading()
             //     }
             // })
+
+            this.getData("http://192.168.1.145:8080/dist/" + url, ele => {
+                // this.alert(JSON.stringify(ele))
+                if (ele.statusText == 'OK') {
+                    navigator.push({
+                        // url: "http://192.168.1.145:8080/dist/" + url,
+                        url: "https://s.kcimg.cn/wap/js/appProduct/1.0.5/" + url,
+                        animated: 'true'
+                    }, () => {
+                        //隐藏加载loading
+                        this.hideLoading()
+                    })
+                } else {
+                    this.alert('网络错误')
+                        //隐藏加载loading
+                    this.hideLoading()
+                }
+            })
         },
         //get请求数据
         getData(ajaxUrl, callback, type) {
@@ -175,9 +176,9 @@ export default {
         goUrlGa(cid, dh, dp, dt) {
             let tid = '';
             let cId = cid;
-            if (weex.config.env.platform == 'android') {
+            if (weex.config.env && weex.config.env.platform == 'android') {
                 tid = 'UA-64002767-20';
-                let ajaxUrl = 'https://www.google-analytics.com/collect?v=1&tid=' + tid + '&cid=' + cId + '&t=pageview&dh=' + dh + '&dp=' + encodeURIComponent(dp) + '&dt=' + encodeURIComponent(dt)
+                let ajaxUrl = 'https://www.google-analytics.com/collect?v=1&tid=' + tid + '&cid=' + cId + '&t=pageview&dh=' + dh + '&dp=' + encodeURI(dp) + '&dt=' + encodeURI(dt)
                 this.getData(ajaxUrl, ele => {
                     //if (ele.ok) {
                     //    this.alert(ajaxUrl)
@@ -186,12 +187,12 @@ export default {
                     //    this.alert(JSON.stringify(ele))
                     //}
                 }, 'text')
-            } else if (weex.config.env.platform == 'iOS') {
+            } else if (weex.config.env && weex.config.env.platform == 'iOS') {
                 tid = 'UA-64002767-21';
                 storage.getItem('deviceId', res => {
                     if (res.result == 'success') {
                         cId = res.data;
-                        let ajaxUrl = 'https://www.google-analytics.com/collect?v=1&tid=' + tid + '&cid=' + cId + '&t=pageview&dh=' + dh + '&dp=' + encodeURIComponent(dp) + '&dt=' + encodeURIComponent(dt)
+                        let ajaxUrl = 'https://www.google-analytics.com/collect?v=1&tid=' + tid + '&cid=' + cId + '&t=pageview&dh=' + dh + '&dp=' + encodeURI(dp) + '&dt=' + encodeURI(dt)
                         this.getData(ajaxUrl, ele => {
                             if (ele.ok) {
                                 //this.alert('https://www.google-analytics.com/collect?v=1&tid=' + tid + '&cid=' + cId + '&t=pageview&dh=' + dh + '&dp=' + dp + '&dt=' + dt)
@@ -206,21 +207,21 @@ export default {
             let tid = '';
             let cId = cid;
 
-            if (weex.config.env.platform == 'android') {
+            if (weex.config.env && weex.config.env.platform == 'android') {
                 tid = 'UA-64002767-20';
-                let ajaxUrl = 'https://www.google-analytics.com/collect?v=1&tid=' + tid + '&cid=' + cId + '&t=event&ec=' + encodeURIComponent(ec) + '&ea=' + encodeURIComponent(ea) + '&el=' + encodeURIComponent(el)
+                let ajaxUrl = 'https://www.google-analytics.com/collect?v=1&tid=' + tid + '&cid=' + cId + '&t=event&ec=' + encodeURI(ec) + '&ea=' + encodeURI(ea) + '&el=' + encodeURI(el)
                 this.getData(ajaxUrl, ele => {
                     //this.alert(JSON.stringify(ele))
                     if (ele.ok) {
                         //this.alert(ajaxUrl)
                     }
                 }, 'text')
-            } else if (weex.config.env.platform == 'iOS') {
+            } else if (weex.config.env && weex.config.env.platform == 'iOS') {
                 tid = 'UA-64002767-21';
                 storage.getItem('deviceId', res => {
                     if (res.result == 'success') {
                         cId = res.data;
-                        let ajaxUrl = 'https://www.google-analytics.com/collect?v=1&tid=' + tid + '&cid=' + cId + '&t=event&ec=' + encodeURIComponent(ec) + '&ea=' + encodeURIComponent(ea) + '&el=' + encodeURIComponent(el)
+                        let ajaxUrl = 'https://www.google-analytics.com/collect?v=1&tid=' + tid + '&cid=' + cId + '&t=event&ec=' + encodeURI(ec) + '&ea=' + encodeURI(ea) + '&el=' + encodeURI(el)
                         this.getData(ajaxUrl, ele => {
                             if (ele.ok) {
                                 //this.alert(ajaxUrl)
@@ -311,9 +312,9 @@ export default {
 
 
 
-            if (weex.config.env.platform == 'android') {
+            if (weex.config.env && weex.config.env.platform == 'android') {
                 platform = 'and_app';
-            } else if (weex.config.env.platform == 'iOS') {
+            } else if (weex.config.env && weex.config.env.platform == 'iOS') {
                 platform = 'ios_app'
             }
 
