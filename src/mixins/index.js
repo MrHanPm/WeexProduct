@@ -51,43 +51,42 @@ export default {
                 this.showLoading()
             }
             //查看版本号
-            storage.getItem('versions', res => {
-                if (res.result == 'success') {
-                    this.getData("https://s.kcimg.cn/wap/js/appProduct/" + res.data + "/" + url, ele => {
-                        if (ele.statusText == 'OK') {
-                            navigator.push({
-                                url: "https://s.kcimg.cn/wap/js/appProduct/" + res.data + "/" + url,
-                                animated: 'true'
-                            }, () => {
-                                //隐藏加载loading
-                                this.hideLoading()
-                            })
-                        } else {
-                            this.alert('网络错误')
-                                //隐藏加载loading
-                            this.hideLoading()
-                        }
-                    })
-                }
-            })
-
-            // this.getData("http://192.168.1.145:8080/dist/" + url, ele => {
-            //     // this.alert(JSON.stringify(ele))
-            //     if (ele.statusText == 'OK') {
-            //         navigator.push({
-            //             // url: "http://192.168.1.145:8080/dist/" + url,
-            //             url: "https://s.kcimg.cn/wap/js/appProduct/1.0.5/" + url,
-            //             animated: 'true'
-            //         }, () => {
-            //             //隐藏加载loading
-            //             this.hideLoading()
+            // storage.getItem('versions', res => {
+            //     if (res.result == 'success') {
+            //         this.getData("https://s.kcimg.cn/wap/js/appProduct/" + res.data + "/" + url, ele => {
+            //             if (ele.statusText == 'OK') {
+            //                 navigator.push({
+            //                     url: "https://s.kcimg.cn/wap/js/appProduct/" + res.data + "/" + url,
+            //                     animated: 'true'
+            //                 }, () => {
+            //                     //隐藏加载loading
+            //                     this.hideLoading()
+            //                 })
+            //             } else {
+            //                 this.alert('网络错误')
+            //                     //隐藏加载loading
+            //                 this.hideLoading()
+            //             }
             //         })
-            //     } else {
-            //         this.alert('网络错误')
-            //             //隐藏加载loading
-            //         this.hideLoading()
             //     }
             // })
+
+            this.getData("http://192.168.1.213:8080/dist/" + url, ele => {
+                // this.alert(JSON.stringify(ele))
+                if (ele.statusText == 'OK') {
+                    navigator.push({
+                        url: "http://192.168.1.213:8080/dist/" + url,
+                        animated: 'true'
+                    }, () => {
+                        //隐藏加载loading
+                        this.hideLoading()
+                    })
+                } else {
+                    this.alert('网络错误')
+                        //隐藏加载loading
+                    this.hideLoading()
+                }
+            })
         },
         //get请求数据
         getData(ajaxUrl, callback, type) {
@@ -115,11 +114,10 @@ export default {
             }, callback)
         },
         //请求链接
-        ajaxUrl() {
+        ajaxUrl (DEBUG = true) {
             let DEV = 'https://product.360che.com';
             let BUILD = 'http://product-yufabu.360che.com';
-            let DBUG = true;
-            let ajaxUrl = DBUG ? DEV : BUILD;
+            let ajaxUrl = DEBUG ? DEV : BUILD;
             return ajaxUrl;
         },
         //显示加载loading
@@ -173,6 +171,7 @@ export default {
             //    })
             //}
         },
+        //Ga统计
         goUrlGa(cid, dh, dp, dt) {
             let tid = '';
             let cId = cid;
@@ -202,7 +201,7 @@ export default {
                 })
             }
         },
-
+        //Ga时事件统计
         eventGa(cid, ec, ea, el) {
             let tid = '';
             let cId = cid;
@@ -233,7 +232,7 @@ export default {
             }
         },
 
-        //GA统计
+        //大数据统计
         // PV/UV
         collect(o) {
             let userId = '';
@@ -264,8 +263,10 @@ export default {
                 platform = 'ios_app'
             }
 
+            // p1 = 0：开屏, 1:资讯, 2:论坛, 3:选车, 4:我的, 5:卡友圈
+            // p2 = 0：品牌 1：筛选 2：按工况 3：排行 4：历史记录
             let p1 = 3;
-            let p2 = 0;
+            let p2 = o.p2 || 0;
 
             let time = setTimeout(() => {
 
@@ -286,6 +287,8 @@ export default {
             }, 300)
 
         },
+
+        // 大数据统计
         //  事件类
         event(o) {
             var userId = '';
@@ -345,7 +348,7 @@ export default {
                 type: 'json',
                 url: 'https://stats.360che.com/app_tj.htm?' + parameter
             }, callback)
-        }
+        },
     },
     created() {
         //iconFont字体

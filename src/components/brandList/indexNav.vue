@@ -2,7 +2,7 @@
     <!--索引导航-->
     <div class="index-nav">
         <div v-for="(ele,index) in indexNav" @click="anchor(ele)">
-            <text :class="['index-nav-text',indicateText==ele?'visible':'']">{{ele}}</text>
+            <text :class="['index-nav-text', indicateText == ele ? 'visible' : '']">{{ele}}</text>
         </div>
 
         <div v-if="indicateShow" class="scale">
@@ -12,28 +12,25 @@
 </template>
 
 <script type="text/babel">
-    var model = weex.requireModule('model')
+    const model = weex.requireModule('model')
     export default {
+        props:['indexNav'],
         data(){
             return {
                 //索引导航弹层提示
-                indicateShow:false,
-                indicateText:'',
+                indicateShow: false,
+                indicateText: '',
             }
         },
-        props:['indexNav'],
         methods: {
-            move(){
-                alert(1)
-            },
-            anchor(index){
-                this.indicateText = index;
-                this.indicateShow = true;
+            anchor (index) {
+                this.indicateText = index
+                this.indicateShow = true
                 let time = setTimeout(() => {
-                    this.indicateShow = false;
+                    this.indicateShow = false
                     clearTimeout(time)
-                },500);
-                this.$emit('anchor',index);
+                },500)
+                this.$emit('anchor',index)
             }
         }
     }
@@ -55,6 +52,7 @@
         padding-top:5px;
         color:#666;
         font-size:28px;
+        text-align: center;
     }
     .scale{
         position: fixed;
@@ -75,7 +73,6 @@
     .indicate-text{
         font-size: 100px;
         color: #fff;
-
     }
     .visible{
         color:#1571e5;

@@ -3,7 +3,7 @@
         <div class="inner">
             <text class="nav-text selected">品牌</text>
         </div>
-        <div class="inner" @click="goWeexUrl('filter.weex.js')">
+        <div class="inner" @click="goUrl('https://product.m.360che.com/price/')">
             <text class="nav-text">筛选</text>
 
         </div>

@@ -4,7 +4,7 @@
         <list style="flex: 1">
             <header ref="goTop">
                 <!--标题-->
-                <title :titleName="titleName" :shareData="shareData" :seriesId="seriesInfo.F_SeriesId"></title>
+                <title :titleName="titleName" :shareData="shareData" :seriesId="seriesInfo.F_SeriesId" :el="el"></title>
             </header>
             <cell>
                 <!--nav导航-->

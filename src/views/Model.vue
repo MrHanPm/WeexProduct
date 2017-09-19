@@ -3,7 +3,7 @@
         <div v-if="iosTop" class="ios-top"></div>
         <list style="flex: 1">
             <header ref="goTop">
-                <title :titleName="titleName" :shareData="shareData" :ProductId="ProductId"></title>
+                <title :titleName="titleName" :shareData="shareData" :ProductId="ProductId" :el="el"></title>
             </header>
             <cell>
                 <nav :navList="navList"></nav>

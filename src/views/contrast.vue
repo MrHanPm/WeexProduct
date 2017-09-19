@@ -322,7 +322,7 @@
                 }else{
                     ele = this.$refs[index][0]
                 }
-                dom.scrollToElement(ele, {offset: -280})
+                dom.scrollToElement(ele, {offset: -368})
                 this.classifyPop = false;
             },
             //询底价
@@ -582,7 +582,7 @@
         /*min-height:80px;*/
         /*height:100%;*/
          padding-top: 33px;
-        padding-bottom:32px; 
+        padding-bottom:32px;
         padding-right: 10px;
         padding-left: 10px;
         justify-content: center;

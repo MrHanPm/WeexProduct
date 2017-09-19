@@ -183,7 +183,7 @@
 
             //点击锚点跳转
             anchor(index){
-                dom.scrollToElement(this.$refs[index][0], {offset: 0})
+                dom.scrollToElement(this.$refs[index][0], {offset: -88})
             },
             //sidebar内容点击跳转
             goInfo(ele){
